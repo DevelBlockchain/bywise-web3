@@ -1,9 +1,8 @@
 import { BywiseResponse, SimulateTx, Tx, TxType } from "../types";
-import BywiseHelper from "../utils/BywiseHelper";
-import Wallet from "../utils/Wallet";
-import Web3 from "./Web3";
+import { BywiseHelper, Wallet } from "../utils";
+import { Web3 } from "./Web3";
 
-export default class TransactionsActions {
+export class TransactionsActions {
     private readonly web3: Web3;
 
     constructor(web3: Web3) {

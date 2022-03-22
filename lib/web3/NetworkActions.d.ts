@@ -6,7 +6,7 @@ export declare type NetworkConfigs = {
     maxConnectedNodes: number;
     createConnection?: () => Promise<BywiseNode>;
 };
-export default class NetworkActions {
+export declare class NetworkActions {
     private updateInterval;
     private readonly network;
     private onlineNodes;

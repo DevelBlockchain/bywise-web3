@@ -1,4 +1,4 @@
-import BywiseTransaction from './BywiseTransaction';
+import { BywiseTransaction } from "./BywiseTransaction";
 export declare enum TxType {
     TX_NONE = "none",
     TX_JSON = "json",
@@ -16,10 +16,10 @@ export declare enum TxType {
 }
 export declare class Tx implements BywiseTransaction {
     version: string;
-    validator: string;
-    from: string[] | string;
-    to: string[] | string;
-    amount: string[] | string;
+    validator?: string;
+    from: string[];
+    to: string[];
+    amount: string[];
     tag: string;
     fee: string;
     type: TxType;
@@ -27,8 +27,9 @@ export declare class Tx implements BywiseTransaction {
     data: any;
     created: string;
     hash: string;
-    validatorSign: string;
-    sign: string[] | string;
+    validatorSign?: string;
+    sign: string[];
+    constructor(tx?: Partial<Tx>);
     toHash(): string;
     isValid(): void;
 }

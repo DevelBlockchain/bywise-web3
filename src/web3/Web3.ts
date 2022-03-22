@@ -1,7 +1,7 @@
 import { Network, BywiseNode } from "../types";
-import NetworkActions, { NetworkConfigs } from "./NetworkActions";
-import TransactionsActions from "./TransactionsActions";
-import AccountsActions from "./AccountsActions";
+import { AccountsActions } from "./AccountsActions";
+import { NetworkActions, NetworkConfigs } from "./NetworkActions";
+import { TransactionsActions } from "./TransactionsActions";
 
 
 const defaultNetwork: { mainnet: Network, testnet: Network } = {
@@ -23,7 +23,7 @@ const defaultNetwork: { mainnet: Network, testnet: Network } = {
     },
 }
 
-export default class Web3 {
+export class Web3 {
     public readonly accounts: AccountsActions;
     public readonly network: NetworkActions;
     public readonly transactions: TransactionsActions;

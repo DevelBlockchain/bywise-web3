@@ -1,2 +1,2 @@
-export default class SlicesActions {
+export declare class SlicesActions {
 }

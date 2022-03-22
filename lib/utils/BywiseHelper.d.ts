@@ -1,5 +1,5 @@
-import { InfoAddress } from './Wallet';
-export default class Helper {
+import { InfoAddress } from '../types/InfoAddress';
+export declare class BywiseHelper {
     static readonly ZERO_ADDRESS = "BWS000000000000000000000000000000000000000000000";
     static makeHash(hexBytes: string): string;
     static encodeBWSAddress: (isMainnet: boolean, isContract: boolean, ethAddress: string, tag?: string | undefined) => string;

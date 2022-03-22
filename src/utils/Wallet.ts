@@ -1,24 +1,7 @@
 import { ethers } from "ethers";
-import BywiseHelper from './BywiseHelper';
+import { BywiseHelper } from "./BywiseHelper";
 
-
-export class InfoAddress {
-    public readonly version: string;
-    public readonly isMainnet: boolean;
-    public readonly isContract: boolean;
-    public readonly ethAddress: string;
-    public readonly tag: string;
-
-    constructor(config: { version: string, isMainnet: boolean, isContract: boolean, ethAddress: string, tag: string }) {
-        this.version = config.version;
-        this.isMainnet = config.isMainnet;
-        this.isContract = config.isContract;
-        this.ethAddress = config.ethAddress;
-        this.tag = config.tag;
-    }
-}
-
-export default class Wallet {
+export class Wallet {
     public readonly seed: string;
     public readonly publicKey: string;
     public readonly address: string;

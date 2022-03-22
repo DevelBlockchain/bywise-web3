@@ -1,3 +1,3 @@
-export default interface BywisePack {
+export interface BywisePack {
     getMerkleRoot(): string
 }

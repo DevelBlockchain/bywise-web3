@@ -1,6 +1,6 @@
 {
   "name": "@bywise/web3",
-  "version": "0.9.0",
+  "version": "0.9.5",
   "description": "Web3 connector of Bywise",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/index.ts",
+    "dev": "ts-node src/dev.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "test": "jest --watch --verbose false --config jestconfig.json"

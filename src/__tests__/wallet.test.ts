@@ -1,5 +1,4 @@
-import Helper from '../utils/Helper';
-import Wallet from '../utils/Wallet';
+import {Wallet, BywiseHelper} from '../utils';
 
 test('Create and import wallet', async () => {
     let wallet = new Wallet({
@@ -10,7 +9,7 @@ test('Create and import wallet', async () => {
         seed: wallet.seed
     });
     await expect(wallet.address).toBe(walletImported.address);
-    await expect(Helper.isValidAddress(wallet.address)).toBe(true);
+    await expect(BywiseHelper.isValidAddress(wallet.address)).toBe(true);
 });
 
 test('Test wallet tag', async () => {
@@ -18,9 +17,9 @@ test('Test wallet tag', async () => {
         isMainnet: true
     });
     let addr = wallet.getAddress();
-    await expect(Helper.getAddressTag(addr)).toBe('');
+    await expect(BywiseHelper.getAddressTag(addr)).toBe('');
     let addrWithTag = wallet.getAddress('banana');
-    await expect(Helper.getAddressTag(addrWithTag)).toBe('banana');
+    await expect(BywiseHelper.getAddressTag(addrWithTag)).toBe('banana');
     await expect(() => {
         let invalidTag = 'banana+';
         wallet.getAddress(invalidTag);
@@ -33,10 +32,10 @@ test('Test Corrupted addresses', async () => {
     });
     let addr = wallet.getAddress();
     let invalidAddress = 'B' + addr;
-    await expect(Helper.isValidAddress(invalidAddress)).toBe(false);
+    await expect(BywiseHelper.isValidAddress(invalidAddress)).toBe(false);
     let corruptedAddress = addr + '4';
-    await expect(Helper.isValidAddress(corruptedAddress)).toBe(true);
+    await expect(BywiseHelper.isValidAddress(corruptedAddress)).toBe(true);
     await expect(() => {
-        Helper.decodeBWSAddress(corruptedAddress)
+        BywiseHelper.decodeBWSAddress(corruptedAddress)
     }).toThrow();
 });

@@ -1,9 +1,9 @@
 import { sha256, base16Decode, base16Encode } from '@waves/ts-lib-crypto';
 import { ethers } from "ethers";
-import { InfoAddress } from './Wallet';
+import { InfoAddress } from '../types/InfoAddress';
 const ethereum_address = require('ethereum-address');
 
-export default class BywiseHelper {
+export class BywiseHelper {
     static readonly ZERO_ADDRESS = 'BWS000000000000000000000000000000000000000000000';
 
     static makeHash(hexBytes: string) {
@@ -74,7 +74,7 @@ export default class BywiseHelper {
     }
 
     static isValidHash = (value: string) => {
-        return /^[a-zA-Z0-9]{64}$/.test(value);
+        return /^[a-f0-9]{64}$/.test(value);
     }
 
     static isValidDate = (date: string) => {

@@ -10,7 +10,7 @@ export type NetworkConfigs = {
     createConnection?: () => Promise<BywiseNode>
 };
 
-export default class NetworkActions {
+export class NetworkActions {
     private updateInterval: any;
     private readonly network: Network;
     private onlineNodes: string[] = [];

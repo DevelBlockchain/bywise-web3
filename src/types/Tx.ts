@@ -1,5 +1,5 @@
-import BywiseHelper from '../utils/BywiseHelper';
-import BywiseTransaction from './BywiseTransaction';
+import { BywiseHelper } from "../utils/BywiseHelper";
+import { BywiseTransaction } from "./BywiseTransaction";
 
 export enum TxType {
     TX_NONE = 'none',
@@ -18,20 +18,37 @@ export enum TxType {
 }
 
 export class Tx implements BywiseTransaction {
-    version: string = '';
+    version: string;
     validator?: string;
-    from: string[] = [];
-    to: string[] = [];
-    amount: string[] = [];
-    tag: string = '';
-    fee: string = '';
-    type: TxType = TxType.TX_NONE;
+    from: string[];
+    to: string[];
+    amount: string[];
+    tag: string;
+    fee: string;
+    type: TxType;
     foreignKeys?: string[];
     data: any;
-    created: string = '';
-    hash: string = '';
+    created: string;
+    hash: string;
     validatorSign?: string;
-    sign: string[] = [];
+    sign: string[];
+
+    constructor(tx?: Partial<Tx>) {
+        this.version = tx?.version ?? '';
+        this.validator = tx?.validator;
+        this.from = tx?.from ?? [];
+        this.to = tx?.to ?? [];
+        this.amount = tx?.amount ?? [];
+        this.tag = tx?.tag ?? '';
+        this.fee = tx?.fee ?? '';
+        this.type = tx?.type ?? TxType.TX_NONE;
+        this.foreignKeys = tx?.foreignKeys;
+        this.data = tx?.data ?? {};
+        this.created = tx?.created ?? '';
+        this.hash = tx?.hash ?? '';
+        this.validatorSign = tx?.validatorSign;
+        this.sign = tx?.sign ?? [];
+    }
 
     toHash(): string {
         let bytes = '';
@@ -54,7 +71,7 @@ export class Tx implements BywiseTransaction {
         bytes += Buffer.from(BywiseHelper.jsonToString(this.data), 'utf-8').toString('hex');
         if (this.foreignKeys) {
             this.foreignKeys.forEach(key => {
-                bytes += key;
+                bytes += Buffer.from(key, 'utf-8').toString('hex');;
             })
         }
         bytes += Buffer.from(this.created, 'utf-8').toString('hex');
@@ -75,7 +92,7 @@ export class Tx implements BywiseTransaction {
         if (this.to.length > 100) throw new Error('maximum number of recipient is 100');
         this.to.forEach((to, i) => {
             if (!BywiseHelper.isValidAddress(to)) throw new Error('invalid transaction recipient address ' + to);
-            if(i === 0) {
+            if (i === 0) {
                 tag = BywiseHelper.getAddressTag(to);
             }
         })

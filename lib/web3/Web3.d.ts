@@ -1,8 +1,8 @@
 import { Network, BywiseNode } from "../types";
-import NetworkActions from "./NetworkActions";
-import TransactionsActions from "./TransactionsActions";
-import AccountsActions from "./AccountsActions";
-export default class Web3 {
+import { AccountsActions } from "./AccountsActions";
+import { NetworkActions } from "./NetworkActions";
+import { TransactionsActions } from "./TransactionsActions";
+export declare class Web3 {
     readonly accounts: AccountsActions;
     readonly network: NetworkActions;
     readonly transactions: TransactionsActions;

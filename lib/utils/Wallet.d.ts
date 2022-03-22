@@ -1,18 +1,4 @@
-export declare class InfoAddress {
-    readonly version: string;
-    readonly isMainnet: boolean;
-    readonly isContract: boolean;
-    readonly ethAddress: string;
-    readonly tag: string;
-    constructor(config: {
-        version: string;
-        isMainnet: boolean;
-        isContract: boolean;
-        ethAddress: string;
-        tag: string;
-    });
-}
-export default class Wallet {
+export declare class Wallet {
     readonly seed: string;
     readonly publicKey: string;
     readonly address: string;

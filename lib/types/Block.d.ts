@@ -1,17 +1,18 @@
-import BywiseTransaction from './BywiseTransaction';
-import BywisePack from './BywisePack';
+import { BywisePack } from "./BywisePack";
+import { BywiseTransaction } from "./BywiseTransaction";
 export declare class Block implements BywiseTransaction, BywisePack {
     height: number;
-    numberOfSlices: number;
     slices: string[];
     version: string;
     from: string;
+    nextSlice: string;
+    nextBlock: string;
     created: string;
-    merkleRoot: string;
     lastHash: string;
     hash: string;
     sign: string;
     externalTxID: string[];
+    constructor(block?: Partial<Block>);
     getMerkleRoot(): string;
     toHash(): string;
     isValid(): void;
