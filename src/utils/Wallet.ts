@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import Helper from './Helper';
+import BywiseHelper from './BywiseHelper';
 
 
 export class InfoAddress {
@@ -39,7 +39,7 @@ export default class Wallet {
     }
 
     getAddress = (tag = ''): string => {
-        return Helper.encodeBWSAddress(this.isMainnet, false, this.account.address, tag);
+        return BywiseHelper.encodeBWSAddress(this.isMainnet, false, this.account.address, tag);
     }
 
     signHash = async (hash: string): Promise<string> => {

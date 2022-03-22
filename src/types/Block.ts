@@ -1,6 +1,6 @@
 import BywiseTransaction from './BywiseTransaction';
 import BywisePack from './BywisePack';
-import Helper from '../utils/Helper';
+import BywiseHelper from '../utils/BywiseHelper';
 
 export class Block implements BywiseTransaction, BywisePack {
     height: number = 0;
@@ -21,7 +21,7 @@ export class Block implements BywiseTransaction, BywisePack {
             this.slices.forEach(sliceHash => {
                 merkleRoot += sliceHash;
             })
-            merkleRoot = Helper.makeHash(merkleRoot);
+            merkleRoot = BywiseHelper.makeHash(merkleRoot);
         } else {
             merkleRoot = '0000000000000000000000000000000000000000000000000000000000000000'
         }
@@ -30,14 +30,14 @@ export class Block implements BywiseTransaction, BywisePack {
 
     toHash(): string {
         let bytes = '';
-        bytes += Helper.numberToHex(this.height);
-        bytes += Helper.numberToHex(this.numberOfSlices);
+        bytes += BywiseHelper.numberToHex(this.height);
+        bytes += BywiseHelper.numberToHex(this.numberOfSlices);
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
         bytes += Buffer.from(this.from, 'utf-8').toString('hex');
         bytes += Buffer.from(this.created, 'utf-8').toString('hex');
         bytes += this.merkleRoot;
         bytes += this.lastHash;
-        bytes = Helper.makeHash(bytes);
+        bytes = BywiseHelper.makeHash(bytes);
         return bytes;
     }
 
@@ -47,14 +47,14 @@ export class Block implements BywiseTransaction, BywisePack {
         if (this.slices.length !== this.numberOfSlices) throw new Error('invalid slice length ' + this.slices.length + ' ' + this.numberOfSlices);
         for (let i = 0; i < this.slices.length; i++) {
             let sliceHash = this.slices[i];
-            if (!Helper.isValidHash(sliceHash)) throw new Error(`invalid slice hash ${i} - ${sliceHash}`);
+            if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid slice hash ${i} - ${sliceHash}`);
         }
         if (this.version !== '1') throw new Error('invalid block version ' + this.version);
-        if (!Helper.isValidAddress(this.from)) throw new Error('invalid block from address ' + this.from);
-        if (!Helper.isValidDate(this.created)) throw new Error('invalid block created date ' + this.created);
+        if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid block from address ' + this.from);
+        if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid block created date ' + this.created);
         if (this.merkleRoot !== this.getMerkleRoot()) throw new Error(`invalid block merkle root ${this.merkleRoot} !== ${this.getMerkleRoot()}`);
-        if (!Helper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);
+        if (!BywiseHelper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);
         if (this.hash !== this.toHash()) throw new Error(`invalid block hash ${this.hash} ${this.toHash()}`);
-        if (!Helper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid block signature');
+        if (!BywiseHelper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid block signature');
     }
 }

@@ -4,23 +4,23 @@ import TransactionsActions from "./TransactionsActions";
 import AccountsActions from "./AccountsActions";
 
 
-const defaultNetwork = {
-    mainnet: new Network({
+const defaultNetwork: { mainnet: Network, testnet: Network } = {
+    mainnet: {
         isMainnet: true,
         nodes: [
             'https://node0.bywise.org',
             'https://node1.bywise.org',
         ],
         explorer: 'https://explorer.bywise.org'
-    }),
-    testnet: new Network({
+    },
+    testnet: {
         isMainnet: false,
         nodes: [
             'https://n0.bywise.org',
             'https://n1.bywise.org',
         ],
         explorer: 'https://testnet.bywise.org'
-    }),
+    },
 }
 
 export default class Web3 {
@@ -45,7 +45,7 @@ export default class Web3 {
             if (configs.network) {
                 networkConfigs.network = configs.network;
             } else {
-                if(configs.isMainnet === false) {
+                if (configs.isMainnet === false) {
                     networkConfigs.network = defaultNetwork.testnet;
                 }
             }

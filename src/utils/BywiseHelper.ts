@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { InfoAddress } from './Wallet';
 const ethereum_address = require('ethereum-address');
 
-export default class Helper {
+export default class BywiseHelper {
     static readonly ZERO_ADDRESS = 'BWS000000000000000000000000000000000000000000000';
 
     static makeHash(hexBytes: string) {
@@ -16,18 +16,18 @@ export default class Helper {
         finalAddress += isContract ? 'C' : 'U';
         finalAddress += ethAddress.substring(2);
         if (tag) {
-            if (!Helper.isValidAlfaNum(tag)) throw new Error('invalid tag ' + tag);
+            if (!BywiseHelper.isValidAlfaNum(tag)) throw new Error('invalid tag ' + tag);
             finalAddress += tag;
         }
-        let checkSum = Helper.makeHash(finalAddress).substring(0, 3);
+        let checkSum = BywiseHelper.makeHash(finalAddress).substring(0, 3);
         finalAddress += checkSum;
-        Helper.decodeBWSAddress(finalAddress);
+        BywiseHelper.decodeBWSAddress(finalAddress);
         return finalAddress;
     }
 
     static decodeBWSAddress = (address: string): InfoAddress => {
-        if (!Helper.isValidAddress(address)) throw new Error('invalid address');
-        if (address === Helper.ZERO_ADDRESS) {
+        if (!BywiseHelper.isValidAddress(address)) throw new Error('invalid address');
+        if (address === BywiseHelper.ZERO_ADDRESS) {
             return new InfoAddress({
                 version: '1',
                 isMainnet: false,
@@ -41,7 +41,7 @@ export default class Helper {
         let ethAddress = '0x' + address.substring(6, 46);
         let tag = address.substring(46, address.length - 3);
         let checkSum = address.substring(address.length - 3);
-        let checkSumCalculed = Helper.makeHash(address.substring(0, address.length - 3)).substring(0, 3);
+        let checkSumCalculed = BywiseHelper.makeHash(address.substring(0, address.length - 3)).substring(0, 3);
         if (checkSum !== checkSumCalculed) throw new Error('corrupted address');
         if(!ethereum_address.isAddress(ethAddress)) throw new Error('invalid address parameters');
         return new InfoAddress({
@@ -54,15 +54,15 @@ export default class Helper {
     }
 
     static getAddressTag = (address: string): string => {
-        return Helper.decodeBWSAddress(address).tag;
+        return BywiseHelper.decodeBWSAddress(address).tag;
     }
 
     static isZeroAddress = (address: string) => {
-        return address === Helper.ZERO_ADDRESS;
+        return address === BywiseHelper.ZERO_ADDRESS;
     }
 
     static isValidAddress = (address: string) => {
-        return address === Helper.ZERO_ADDRESS || /^BWS1[MT][CU][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3}$/.test(address);
+        return address === BywiseHelper.ZERO_ADDRESS || /^BWS1[MT][CU][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3}$/.test(address);
     }
 
     static isValidAmount = (amount: string) => {
@@ -86,7 +86,7 @@ export default class Helper {
             return false;
         }
         let recoveredAddress = ethers.utils.verifyMessage(hash, sign);
-        let decodedSignAddress = Helper.decodeBWSAddress(signAddress);
+        let decodedSignAddress = BywiseHelper.decodeBWSAddress(signAddress);
         if (recoveredAddress !== decodedSignAddress.ethAddress) {
             return false;
         }

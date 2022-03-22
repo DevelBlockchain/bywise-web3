@@ -1,5 +1,5 @@
 import { BywiseResponse, SimulateTx, Tx, TxType } from "../types";
-import Helper from "../utils/Helper";
+import BywiseHelper from "../utils/BywiseHelper";
 import Wallet from "../utils/Wallet";
 import Web3 from "./Web3";
 
@@ -10,14 +10,13 @@ export default class TransactionsActions {
         this.web3 = web3;
     }
 
-    buildTx = async (wallet: Wallet, to: string, amount: string, type?: TxType, data?: any, foreignKeys?: string[], validator?: string): Promise<Tx> => {
+    buildTx = async (wallet: Wallet, to: string, amount: string, type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
         let tx = new Tx();
         tx.version = "1";
-        tx.validator = validator ? validator : wallet.address;
-        tx.from = wallet.address;
-        tx.to = to;
-        tx.amount = amount;
-        tx.tag = Helper.getAddressTag(to);
+        tx.from = [wallet.address];
+        tx.to = [to];
+        tx.amount = [amount];
+        tx.tag = BywiseHelper.getAddressTag(to);
         tx.type = type ? type : TxType.TX_NONE;
         if (type) {
             tx.data = data ? data : {};
@@ -43,8 +42,7 @@ export default class TransactionsActions {
 
         tx.fee = simulate.data.fee;
         tx.hash = tx.toHash();
-        tx.sign = await wallet.signHash(tx.hash);
-        tx.validatorSign = tx.sign;
+        tx.sign = [await wallet.signHash(tx.hash)];
         return tx;
     }
 
