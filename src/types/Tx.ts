@@ -1,10 +1,13 @@
 import { BywiseHelper } from "../utils/BywiseHelper";
+import { Block } from "./Block";
 import { BywiseTransaction } from "./BywiseTransaction";
+import { Slice } from "./Slice";
 
 export enum TxType {
     TX_NONE = 'none',
     TX_JSON = 'json',
     TX_COMMAND = 'command',
+    TX_COMMAND_INFO = "command-info",
     TX_CONTRACT = 'contract',
     TX_CONTRACT_EXE = 'contract-exe',
     TX_FILE = 'file',
@@ -138,4 +141,20 @@ export type SimulateTx = {
     foreignKeys?: string[];
     type: TxType;
     data: any;
+}
+
+export type TxOutput = {
+    cost?: number;
+    size?: number;
+    feeUsed: string;
+    fee: string;
+    logs?: string[];
+    error?: string;
+    output?: any;
+}
+
+export type TxBlockchainInfo = {
+    tx?: Tx;
+    slice?: Slice;
+    block?: Block;
 }

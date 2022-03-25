@@ -1,7 +1,7 @@
 import { Wallet } from "../utils/Wallet";
 import { Web3 } from "./Web3";
 
-export class AccountsActions {
+export class WalletsActions {
     private readonly web3: Web3;
 
     constructor(web3: Web3) {

@@ -1,13 +1,15 @@
 import { BywiseApi, BywiseNode, BywiseResponse, Network } from "../types";
 const randomstring = require("randomstring");
 
-export type SendAction = (node: BywiseNode) => Promise<BywiseResponse>
+export type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>
+export type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>
 
 export type NetworkConfigs = {
     isMainnet: boolean,
     network: Network,
     maxConnectedNodes: number,
     createConnection?: () => Promise<BywiseNode>
+    debug: boolean,
 };
 
 export class NetworkActions {
@@ -22,7 +24,7 @@ export class NetworkActions {
 
     constructor(configs: NetworkConfigs) {
         this.maxConnectedNodes = configs.maxConnectedNodes;
-        this.api = new BywiseApi();
+        this.api = new BywiseApi(configs.debug);
         this.network = configs.network;
         this.isMainnet = configs.network.isMainnet;
         if (configs.createConnection) {
@@ -52,6 +54,10 @@ export class NetworkActions {
     }
 
     private updateConnection = async () => {
+        if (this.network.nodes.length === 0) {
+            this.isConnected = true;
+            return;
+        }
         for (let i = this.connectedNodes.length - 1; i >= 0; i--) {
             const node = this.connectedNodes[i];
             let req = await this.api.tryToken(node);
@@ -117,18 +123,27 @@ export class NetworkActions {
         return this.connectedNodes[Math.floor(Math.random() * (this.connectedNodes.length - 1))];
     }
 
-    send = async (sendAction: SendAction) => {
+    async sendAll(sendAction: SendAction): Promise<boolean> {
         if (!this.isConnected) throw new Error('First connect to blockchain - "web3.network.connect()"');
-        let req = new BywiseResponse();
-        let successReq: BywiseResponse | undefined = undefined;
+        let success = false;
         for (let i = 0; i < this.connectedNodes.length; i++) {
             const node = this.connectedNodes[i];
-            req = await sendAction(node);
+            let req = await sendAction(node);
             if (!req.error) {
-                successReq = req;
+                success = true;
             }
         }
-        if (!successReq) throw new Error(`send failed - details: ${req.error}`);
-        return successReq;
+        return success;
+    }
+
+    async findAll<T>(filterAction: FilterAction<T>): Promise<T | undefined> {
+        if (!this.isConnected) throw new Error('First connect to blockchain - "web3.network.connect()"');
+        for (let i = 0; i < this.connectedNodes.length; i++) {
+            const node = this.connectedNodes[i];
+            let req = await filterAction(node);
+            if (req !== undefined) {
+                return req;
+            }
+        }
     }
 }
