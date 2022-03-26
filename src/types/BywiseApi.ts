@@ -1,4 +1,5 @@
 import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo } from '.';
+import { WalletInfo } from '../utils';
 import { Block } from './Block';
 import { CountType } from './BywiseNode';
 const axios = require('axios');
@@ -175,6 +176,14 @@ export class BywiseApi {
 
     getFeeTransaction(node: BywiseNode, simulateTx: SimulateTx): Promise<BywiseResponse<TxOutput>> {
         return this.post(`${node.host}/api/v1/transactions/fee`, node.token, simulateTx);
+    }
+
+    getWalletInfo(node: BywiseNode, address: string): Promise<BywiseResponse<WalletInfo>> {
+        return this.get(`${node.host}/api/v1/wallets/${address}`, node.token);
+    }
+    
+    countWallets(node: BywiseNode): Promise<BywiseResponse<CountType>> {
+        return this.get(`${node.host}/api/v1/wallets/count`, node.token);
     }
 
     tryToken(node: BywiseNode): Promise<BywiseResponse<void>> {

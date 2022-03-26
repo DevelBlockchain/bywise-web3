@@ -29,3 +29,13 @@ export class Wallet {
         return (await this.account.signMessage(hash));
     }
 }
+
+export type WalletInfo = {
+    balance: string,
+    address: string,
+    name?: string,
+    photo?: string,
+    url?: string,
+    bio?: string,
+    publicKey?: string,
+}

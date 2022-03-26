@@ -15,5 +15,5 @@ export declare class Block implements BywiseTransaction, BywisePack {
     constructor(block?: Partial<Block>);
     getMerkleRoot(): string;
     toHash(): string;
-    isValid(): undefined;
+    isValid(): void;
 }

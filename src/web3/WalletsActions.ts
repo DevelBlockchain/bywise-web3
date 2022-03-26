@@ -1,4 +1,4 @@
-import { Wallet } from "../utils/Wallet";
+import { Wallet, WalletInfo } from "../utils/Wallet";
 import { Web3 } from "./Web3";
 
 export class WalletsActions {
@@ -14,5 +14,23 @@ export class WalletsActions {
 
     importWallet(seed: string) {
         return new Wallet({ isMainnet: this.web3.network.isMainnet, seed });
+    }
+
+    getWalletInfo = async (address: string): Promise<WalletInfo | undefined> => {
+        return await this.web3.network.findAll(async (node) => {
+            let req = await this.web3.network.api.getWalletInfo(node, address);
+            if (!req.error) {
+                return req.data;
+            }
+        });
+    }
+
+    countWallets = async (): Promise<number | undefined> => {
+        return await this.web3.network.findAll(async (node) => {
+            let req = await this.web3.network.api.countWallets(node);
+            if (!req.error) {
+                return req.data.count;
+            }
+        });
     }
 }

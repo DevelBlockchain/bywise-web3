@@ -1,10 +1,12 @@
 import { BywiseApi, BywiseNode, BywiseResponse, Network } from "../types";
-export declare type SendAction = (node: BywiseNode) => Promise<BywiseResponse>;
+export declare type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>;
+export declare type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
 export declare type NetworkConfigs = {
     isMainnet: boolean;
     network: Network;
     maxConnectedNodes: number;
     createConnection?: () => Promise<BywiseNode>;
+    debug: boolean;
 };
 export declare class NetworkActions {
     private updateInterval;
@@ -21,5 +23,6 @@ export declare class NetworkActions {
     disconnect: () => void;
     private updateConnection;
     getRandomNode: () => BywiseNode;
-    send: (sendAction: SendAction) => Promise<BywiseResponse>;
+    sendAll(sendAction: SendAction): Promise<boolean>;
+    findAll<T>(filterAction: FilterAction<T>): Promise<T | undefined>;
 }
