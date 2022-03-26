@@ -1,4 +1,4 @@
-import { BywiseResponse, CountType, SimulateTx, Tx, TxBlockchainInfo, TxOutput, TxType } from "../types";
+import { PublishedTx, SimulateTx, Tx, TxBlockchainInfo, TxType } from "../types";
 import { BywiseHelper, Wallet } from "../utils";
 import { Web3 } from "./Web3";
 
@@ -88,7 +88,7 @@ export class TransactionsActions {
         });
     }
 
-    getTransactionByHash = async (txHash: string): Promise<Tx | undefined> => {
+    getTransactionByHash = async (txHash: string): Promise<PublishedTx | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getTransactionByHash(node, txHash);
             if (!req.error) {
@@ -106,7 +106,7 @@ export class TransactionsActions {
         });
     }
 
-    getTxs = async (parameters: { from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string, offset?: number, limit?: number, asc?: boolean }): Promise<Tx[] | undefined> => {
+    getTxs = async (parameters: { from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string, offset?: number, limit?: number, asc?: boolean } = {}): Promise<PublishedTx[] | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getTxs(node, parameters);
             if (!req.error) {
@@ -115,7 +115,7 @@ export class TransactionsActions {
         });
     }
 
-    countTxs = async (parameters: { from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string }): Promise<number | undefined> => {
+    countTxs = async (parameters: { from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string } = {}): Promise<number | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.countTxs(node, parameters);
             if (!req.error) {

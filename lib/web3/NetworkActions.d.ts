@@ -11,7 +11,7 @@ export declare type NetworkConfigs = {
 export declare class NetworkActions {
     private updateInterval;
     private readonly network;
-    private onlineNodes;
+    onlineNodes: string[];
     readonly api: BywiseApi;
     readonly isMainnet: boolean;
     readonly maxConnectedNodes: number;
@@ -19,6 +19,11 @@ export declare class NetworkActions {
     connectedNodes: BywiseNode[];
     constructor(configs: NetworkConfigs);
     private createConnection;
+    exportConnections: () => {
+        isConnected: boolean;
+        connectedNodes: BywiseNode[];
+    };
+    importConnections: (payload: any) => Promise<void>;
     connect: () => Promise<void>;
     disconnect: () => void;
     private updateConnection;

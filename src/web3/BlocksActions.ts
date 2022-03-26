@@ -57,7 +57,7 @@ export class BlocksActions {
         });
     }
 
-    getBlocks = async (parameters: { height?: number, from?: string, offset?: number, limit?: number, asc?: boolean }): Promise<Block[] | undefined> => {
+    getBlocks = async (parameters: { height?: number, from?: string, lastHash?: string, offset?: number, limit?: number, asc?: boolean } = {}): Promise<Block[] | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getBlocks(node, parameters);
             if (!req.error) {
@@ -66,7 +66,7 @@ export class BlocksActions {
         });
     }
 
-    countBlocks = async (parameters: { height?: number, from?: string }): Promise<number | undefined> => {
+    countBlocks = async (parameters: { height?: number, from?: string } = {}): Promise<number | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.countBlocks(node, parameters);
             if (!req.error) {

@@ -15,7 +15,7 @@ export type NetworkConfigs = {
 export class NetworkActions {
     private updateInterval: any;
     private readonly network: Network;
-    private onlineNodes: string[] = [];
+    public onlineNodes: string[] = [];
     public readonly api: BywiseApi;
     public readonly isMainnet: boolean = true;
     public readonly maxConnectedNodes: number;
@@ -39,6 +39,19 @@ export class NetworkActions {
         });
     }
 
+    exportConnections = () => {
+        return {
+            isConnected: this.isConnected,
+            connectedNodes: this.connectedNodes,
+        }
+    }
+
+    importConnections = async (payload: any) => {
+        this.isConnected = payload.isConnected;
+        this.connectedNodes = payload.connectedNodes;
+        await this.updateConnection();
+    }
+
     connect = async () => {
         if (!this.isConnected) {
             await this.updateConnection();
@@ -58,11 +71,15 @@ export class NetworkActions {
             this.isConnected = true;
             return;
         }
+        let now = Date.now();
         for (let i = this.connectedNodes.length - 1; i >= 0; i--) {
             const node = this.connectedNodes[i];
-            let req = await this.api.tryToken(node);
-            if (req.error) {
-                this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
+            let created = new Date(node.updated).getTime();
+            if(now > created + 30000) {
+                let req = await this.api.tryToken(node);
+                if (req.error) {
+                    this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
+                }
             }
         }
         let testNodes: string[] = [];

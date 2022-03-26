@@ -6,14 +6,15 @@ export declare class BlocksActions {
     findLastBlocks: (limit?: number) => Promise<Block[]>;
     findBlocksFromHeight: (height: number, limit?: number) => Promise<Block[]>;
     getBlockByHash: (blockHash: string) => Promise<Block | undefined>;
-    getBlocks: (parameters: {
+    getBlocks: (parameters?: {
         height?: number;
         from?: string;
+        lastHash?: string;
         offset?: number;
         limit?: number;
         asc?: boolean;
     }) => Promise<Block[] | undefined>;
-    countBlocks: (parameters: {
+    countBlocks: (parameters?: {
         height?: number;
         from?: string;
     }) => Promise<number | undefined>;

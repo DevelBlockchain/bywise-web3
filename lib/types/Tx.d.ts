@@ -54,8 +54,26 @@ export declare type TxOutput = {
     error?: string;
     output?: any;
 };
+export declare type PublishedTx = {
+    version: string;
+    validator?: string;
+    from: string[];
+    to: string[];
+    amount: string[];
+    tag: string;
+    fee: string;
+    type: TxType;
+    foreignKeys?: string[];
+    data: any;
+    created: string;
+    hash: string;
+    validatorSign?: string;
+    sign: string[];
+    status: string;
+    output: TxOutput;
+};
 export declare type TxBlockchainInfo = {
-    tx?: Tx;
+    tx: PublishedTx;
     slice?: Slice;
     block?: Block;
 };

@@ -1,4 +1,4 @@
-import { Tx, TxBlockchainInfo, TxType } from "../types";
+import { PublishedTx, Tx, TxBlockchainInfo, TxType } from "../types";
 import { Wallet } from "../utils";
 import { Web3 } from "./Web3";
 export declare class TransactionsActions {
@@ -9,9 +9,9 @@ export declare class TransactionsActions {
     signTx: (wallets: Wallet[], tx: Tx) => Promise<Tx>;
     estimateFee: (tx: Tx) => Promise<string>;
     sendTransaction: (tx: Tx) => Promise<boolean>;
-    getTransactionByHash: (txHash: string) => Promise<Tx | undefined>;
+    getTransactionByHash: (txHash: string) => Promise<PublishedTx | undefined>;
     getTransactionBlockchainInfo: (txHash: string) => Promise<TxBlockchainInfo | undefined>;
-    getTxs: (parameters: {
+    getTxs: (parameters?: {
         from?: string[];
         to?: string[];
         foreignKeys?: string[];
@@ -22,8 +22,8 @@ export declare class TransactionsActions {
         offset?: number;
         limit?: number;
         asc?: boolean;
-    }) => Promise<Tx[] | undefined>;
-    countTxs: (parameters: {
+    }) => Promise<PublishedTx[] | undefined>;
+    countTxs: (parameters?: {
         from?: string[];
         to?: string[];
         foreignKeys?: string[];

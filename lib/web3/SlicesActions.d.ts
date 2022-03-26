@@ -1,4 +1,4 @@
-import { Slice, Tx } from "../types";
+import { PublishedTx, Slice } from "../types";
 import { Web3 } from "./Web3";
 export declare class SlicesActions {
     private readonly web3;
@@ -6,16 +6,16 @@ export declare class SlicesActions {
     sendSlice: (slice: Slice) => Promise<boolean>;
     findLastSlices: (limit?: number) => Promise<Slice[]>;
     getSliceByHash: (sliceHash: string) => Promise<Slice | undefined>;
-    getSlices: (parameters: {
+    getSlices: (parameters?: {
         from?: string;
-        blockHash?: string;
+        lastBlockHash?: string;
         offset?: number;
         limit?: number;
         asc?: boolean;
     }) => Promise<Slice[] | undefined>;
-    countSlices: (parameters: {
+    countSlices: (parameters?: {
         from?: string;
-        blockHash?: string;
+        lastBlockHash?: string;
     }) => Promise<number | undefined>;
-    getTransactionsFromSlice: (sliceHash: string) => Promise<Tx[] | undefined>;
+    getTransactionsFromSlice: (sliceHash: string) => Promise<PublishedTx[] | undefined>;
 }
