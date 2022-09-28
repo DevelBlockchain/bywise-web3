@@ -6,6 +6,7 @@ export type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>
 
 export type NetworkConfigs = {
     isClient: boolean,
+    myHost: string,
     networks: Network[],
     maxConnectedNodes: number,
     createConnection?: () => Promise<BywiseNode>
@@ -17,6 +18,7 @@ export class NetworkActions {
     private readonly chains: string[];
     public readonly api: BywiseApi;
     public readonly isClient: boolean;
+    public readonly myHost: string;
     public readonly maxConnectedNodes: number;
     public isConnected: boolean = false;
     public connectedNodes: BywiseNode[] = [];
@@ -25,6 +27,7 @@ export class NetworkActions {
         this.maxConnectedNodes = configs.maxConnectedNodes;
         this.api = new BywiseApi(configs.debug);
         this.networks = configs.networks;
+        this.myHost = configs.myHost;
         this.isClient = configs.isClient;
         if (this.networks.length == 0) {
             throw new Error(`networks cant be empty`)
@@ -103,7 +106,11 @@ export class NetworkActions {
         const newKnowHosts: string[] = [];
         for (let i = knowHosts.length - 1; i >= 0; i--) {
             const host = knowHosts[i];
+
             let found = false;
+            if(host === this.myHost) {
+                found = true;
+            }
             this.connectedNodes.forEach(n => {
                 if (n.host === host) {
                     found = true;

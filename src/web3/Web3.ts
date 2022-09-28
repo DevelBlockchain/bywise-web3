@@ -33,7 +33,7 @@ export class Web3 {
     public readonly slices: SlicesActions;
     private readonly debug: boolean = false;
 
-    constructor(configs?: { networks?: Network[], maxConnectedNodes?: number, createConnection?: () => Promise<BywiseNode>, debug?: boolean }) {
+    constructor(configs?: { networks?: Network[], maxConnectedNodes?: number, myHost?: string, createConnection?: () => Promise<BywiseNode>, debug?: boolean }) {
         if (configs) {
             this.debug = configs.debug ? configs.debug : false;
         }
@@ -41,6 +41,7 @@ export class Web3 {
             networks: [defaultNetwork.mainnet, defaultNetwork.testnet],
             isClient: false,
             maxConnectedNodes: 10,
+            myHost: '',
             createConnection: undefined,
             debug: this.debug,
         }
@@ -50,6 +51,10 @@ export class Web3 {
             }
             if (configs.createConnection) {
                 networkConfigs.createConnection = configs.createConnection;
+                networkConfigs.isClient = false;
+            }
+            if (configs.myHost) {
+                networkConfigs.myHost = configs.myHost;
                 networkConfigs.isClient = false;
             }
             if (configs.networks) {

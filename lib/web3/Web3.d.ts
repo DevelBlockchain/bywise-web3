@@ -14,6 +14,7 @@ export declare class Web3 {
     constructor(configs?: {
         networks?: Network[];
         maxConnectedNodes?: number;
+        myHost?: string;
         createConnection?: () => Promise<BywiseNode>;
         debug?: boolean;
     });

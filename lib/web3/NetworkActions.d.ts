@@ -3,6 +3,7 @@ export declare type SendAction = (node: BywiseNode) => Promise<BywiseResponse<an
 export declare type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
 export declare type NetworkConfigs = {
     isClient: boolean;
+    myHost: string;
     networks: Network[];
     maxConnectedNodes: number;
     createConnection?: () => Promise<BywiseNode>;
@@ -13,6 +14,7 @@ export declare class NetworkActions {
     private readonly chains;
     readonly api: BywiseApi;
     readonly isClient: boolean;
+    readonly myHost: string;
     readonly maxConnectedNodes: number;
     isConnected: boolean;
     connectedNodes: BywiseNode[];

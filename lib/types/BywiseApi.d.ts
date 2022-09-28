@@ -1,7 +1,7 @@
 import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx } from '.';
 import { WalletInfo } from '../utils';
 import { PublishedBlock } from './Block';
-import { CountType } from './BywiseNode';
+import { ConfigNode, CountType } from './BywiseNode';
 import { PublishedSlice } from './Slice';
 export declare type BywiseResponse<T> = {
     data: T;
@@ -12,6 +12,7 @@ export declare class BywiseApi {
     constructor(debug?: boolean);
     private get;
     private post;
+    getConfigs(node: BywiseNode, chain: string): Promise<BywiseResponse<ConfigNode[]>>;
     getBlocks(node: BywiseNode, parameters: {
         height?: number;
         from?: string;
