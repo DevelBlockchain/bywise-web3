@@ -9,11 +9,11 @@ export class WalletsActions {
     }
 
     createWallet() {
-        return new Wallet({ isMainnet: this.web3.network.isMainnet });
+        return new Wallet();
     }
 
     importWallet(seed: string) {
-        return new Wallet({ isMainnet: this.web3.network.isMainnet, seed });
+        return new Wallet({ seed });
     }
 
     getWalletInfo = async (address: string): Promise<WalletInfo | undefined> => {

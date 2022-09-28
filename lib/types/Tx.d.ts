@@ -19,6 +19,7 @@ export declare enum TxType {
 }
 export declare class Tx implements BywiseTransaction {
     version: string;
+    chain: string;
     validator?: string;
     from: string[];
     to: string[];

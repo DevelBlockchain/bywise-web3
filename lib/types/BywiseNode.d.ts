@@ -1,9 +1,9 @@
 export declare class BywiseNode {
-    isFullNode: boolean;
     version: string;
-    updated: string;
-    host?: string;
-    address?: string;
+    expire: number;
+    chains: string[];
+    host: string;
+    address: string;
     token?: string;
     constructor(config: Partial<BywiseNode>);
 }
@@ -14,12 +14,11 @@ export declare type ConfigNode = {
 };
 export declare type InfoNode = {
     address: string;
-    host?: string;
+    host: string;
     version: string;
     timestamp: string;
-    isFullNode: boolean;
-    nodesLimit: number;
-    explorer: string;
+    chains: string[];
+    explorers: string[];
     nodes: BywiseNode[];
     configs: ConfigNode[];
 };

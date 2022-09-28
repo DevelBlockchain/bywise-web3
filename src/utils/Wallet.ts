@@ -5,15 +5,12 @@ export class Wallet {
     public readonly seed: string;
     public readonly publicKey: string;
     public readonly address: string;
-    public readonly isMainnet: boolean;
     private readonly account: ethers.Wallet;
 
     constructor(config?: { isMainnet?: boolean, seed?: string }) {
         if (config) {
-            this.isMainnet = config.isMainnet ? config.isMainnet : true;
             this.seed = config.seed ? config.seed : ethers.Wallet.createRandom()._mnemonic().phrase;
         } else {
-            this.isMainnet = true;
             this.seed = ethers.Wallet.createRandom()._mnemonic().phrase;
         }
         this.account = ethers.Wallet.fromMnemonic(this.seed);
@@ -22,7 +19,7 @@ export class Wallet {
     }
 
     getAddress = (tag = ''): string => {
-        return BywiseHelper.encodeBWSAddress(this.isMainnet, false, this.account.address, tag);
+        return BywiseHelper.encodeBWSAddress(true, false, this.account.address, tag);
     }
 
     signHash = async (hash: string): Promise<string> => {

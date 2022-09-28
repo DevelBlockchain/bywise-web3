@@ -4,6 +4,7 @@ export declare class Slice implements BywiseTransaction, BywisePack {
     height: number;
     transactions: string[];
     version: string;
+    chain: string;
     from: string;
     next: string;
     created: string;

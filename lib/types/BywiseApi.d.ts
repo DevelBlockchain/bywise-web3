@@ -67,7 +67,7 @@ export declare class BywiseApi {
     getFeeTransaction(node: BywiseNode, simulateTx: SimulateTx): Promise<BywiseResponse<TxOutput>>;
     getWalletInfo(node: BywiseNode, address: string): Promise<BywiseResponse<WalletInfo>>;
     countWallets(node: BywiseNode): Promise<BywiseResponse<CountType>>;
-    tryToken(node: BywiseNode): Promise<BywiseResponse<void>>;
+    tryToken(node: BywiseNode): Promise<BywiseResponse<InfoNode>>;
     getInfo(host: string): Promise<BywiseResponse<InfoNode>>;
-    tryHandshake(host: string, myNode: BywiseNode): Promise<BywiseResponse<BywiseNode>>;
+    tryHandshake(host: string, myNode?: BywiseNode): Promise<BywiseResponse<BywiseNode>>;
 }

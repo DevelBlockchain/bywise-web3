@@ -1,6 +1,6 @@
 export declare type Network = {
-    isMainnet: boolean;
     nodes: string[];
+    chain: string;
     explorer: string;
     myHost?: string;
 };

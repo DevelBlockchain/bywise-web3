@@ -2,20 +2,18 @@ import { BywiseApi, BywiseNode, BywiseResponse, Network } from "../types";
 export declare type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>;
 export declare type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
 export declare type NetworkConfigs = {
-    isMainnet: boolean;
-    network: Network;
+    isClient: boolean;
+    networks: Network[];
     maxConnectedNodes: number;
     createConnection?: () => Promise<BywiseNode>;
     debug: boolean;
 };
 export declare class NetworkActions {
-    private updateInterval;
-    private readonly network;
-    onlineNodes: string[];
+    private readonly networks;
+    private readonly chains;
     readonly api: BywiseApi;
-    readonly isMainnet: boolean;
+    readonly isClient: boolean;
     readonly maxConnectedNodes: number;
-    private isDisconnect;
     isConnected: boolean;
     connectedNodes: BywiseNode[];
     constructor(configs: NetworkConfigs);
@@ -25,8 +23,14 @@ export declare class NetworkActions {
         connectedNodes: BywiseNode[];
     };
     importConnections: (payload: any) => Promise<void>;
-    tryConnection: () => Promise<number | undefined>;
-    getRandomNode: () => BywiseNode;
-    sendAll(sendAction: SendAction): Promise<boolean>;
-    findAll<T>(filterAction: FilterAction<T>): Promise<T | undefined>;
+    private populateKnowHosts;
+    private includesChain;
+    private excludeOfflineNodesAndUpdateKnowHosts;
+    private removeConnectedNodes;
+    private tryConnecteKnowNodes;
+    tryConnection: () => Promise<number>;
+    addNode: (node: BywiseNode) => void;
+    getRandomNode: (chain?: string | undefined) => BywiseNode;
+    sendAll(sendAction: SendAction, chain?: string): Promise<boolean>;
+    findAll<T>(filterAction: FilterAction<T>, chain?: string): Promise<T | undefined>;
 }

@@ -12,8 +12,7 @@ export declare class Web3 {
     readonly slices: SlicesActions;
     private readonly debug;
     constructor(configs?: {
-        isMainnet?: boolean;
-        network?: Network;
+        networks?: Network[];
         maxConnectedNodes?: number;
         createConnection?: () => Promise<BywiseNode>;
         debug?: boolean;

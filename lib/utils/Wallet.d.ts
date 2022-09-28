@@ -2,7 +2,6 @@ export declare class Wallet {
     readonly seed: string;
     readonly publicKey: string;
     readonly address: string;
-    readonly isMainnet: boolean;
     private readonly account;
     constructor(config?: {
         isMainnet?: boolean;

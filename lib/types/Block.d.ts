@@ -4,6 +4,7 @@ export declare class Block implements BywiseTransaction, BywisePack {
     height: number;
     slices: string[];
     version: string;
+    chain: string;
     from: string;
     nextSlice: string;
     nextBlock: string;
