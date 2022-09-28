@@ -26,11 +26,10 @@ export type InfoNode = {
     address: string;
     host: string;
     version: string;
-    timestamp: string;
+    timestamp: number;
     chains: string[];
     explorers: string[];
     nodes: BywiseNode[];
-    configs: ConfigNode[];
 }
 
 export type CountType = {
