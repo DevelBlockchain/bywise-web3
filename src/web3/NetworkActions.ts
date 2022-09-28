@@ -50,36 +50,19 @@ export class NetworkActions {
     importConnections = async (payload: any) => {
         this.isConnected = payload.isConnected;
         this.connectedNodes = payload.connectedNodes;
-        await this.updateConnection();
+        await this.tryConnection();
     }
 
-    connect = async () => {
-        if (!this.isConnected) {
-            this.isConnected = true;
-            await this.updateConnection();
-        }
-    }
-
-    disconnect = () => {
-        this.isDisconnect = true;
-        this.connectedNodes = [];
-        this.onlineNodes = [];
-    }
-
-    private updateConnection = async () => {
+    tryConnection = async () => {
         if (this.network.nodes.length === 0) {
             this.isConnected = true;
             return;
         }
-        let now = Date.now();
         for (let i = this.connectedNodes.length - 1; i >= 0; i--) {
             const node = this.connectedNodes[i];
-            let created = new Date(node.updated).getTime();
-            if (now > created + 30000) {
-                let req = await this.api.tryToken(node);
-                if (req.error) {
-                    this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
-                }
+            let req = await this.api.tryToken(node);
+            if (req.error) {
+                this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
             }
         }
         let testNodes: string[] = [];
@@ -133,13 +116,8 @@ export class NetworkActions {
             this.isConnected = true;
         } else {
             this.isConnected = false;
-            throw new Error('Bywise Web3 - Can\'t connect any node');
         }
-        if(!this.isDisconnect) {
-            setTimeout(this.updateConnection, 30000);
-        } else {
-            this.isConnected = false;
-        }
+        return this.connectedNodes.length;
     }
 
     getRandomNode = () => {
