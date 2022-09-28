@@ -15,3 +15,14 @@ export declare class Slice implements BywiseTransaction, BywisePack {
     toHash(): string;
     isValid(): void;
 }
+export declare type PublishedSlice = {
+    height: number;
+    transactions: string[];
+    version: string;
+    from: string;
+    next: string;
+    created: string;
+    lastBlockHash: string;
+    hash: string;
+    sign: string;
+};

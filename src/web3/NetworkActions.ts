@@ -19,6 +19,7 @@ export class NetworkActions {
     public readonly api: BywiseApi;
     public readonly isMainnet: boolean = true;
     public readonly maxConnectedNodes: number;
+    private isDisconnect: boolean = false;
     public isConnected: boolean = false;
     public connectedNodes: BywiseNode[] = [];
 
@@ -54,14 +55,13 @@ export class NetworkActions {
 
     connect = async () => {
         if (!this.isConnected) {
+            this.isConnected = true;
             await this.updateConnection();
-            this.updateInterval = setInterval(this.updateConnection, 30000);
         }
     }
 
     disconnect = () => {
-        clearInterval(this.updateInterval);
-        this.isConnected = false;
+        this.isDisconnect = true;
         this.connectedNodes = [];
         this.onlineNodes = [];
     }
@@ -75,7 +75,7 @@ export class NetworkActions {
         for (let i = this.connectedNodes.length - 1; i >= 0; i--) {
             const node = this.connectedNodes[i];
             let created = new Date(node.updated).getTime();
-            if(now > created + 30000) {
+            if (now > created + 30000) {
                 let req = await this.api.tryToken(node);
                 if (req.error) {
                     this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
@@ -99,32 +99,34 @@ export class NetworkActions {
         });
         for (let i = 0; i < testNodes.length && this.connectedNodes.length < this.maxConnectedNodes; i++) {
             const nodeHost = testNodes[i];
-            let info = await this.api.getInfo(nodeHost);
-            if (info.error) {
-                this.onlineNodes = this.onlineNodes.filter(host => host !== nodeHost);
-            } else {
-                if (!this.onlineNodes.includes(nodeHost)) {
-                    this.onlineNodes.push(nodeHost);
-                }
-                let isConnected = false;
-                this.connectedNodes.forEach(n => {
-                    if (n.host === nodeHost) {
-                        isConnected = true;
+            if (nodeHost !== this.network.myHost) {
+                let info = await this.api.getInfo(nodeHost);
+                if (info.error) {
+                    this.onlineNodes = this.onlineNodes.filter(host => host !== nodeHost);
+                } else {
+                    if (!this.onlineNodes.includes(nodeHost)) {
+                        this.onlineNodes.push(nodeHost);
                     }
-                })
-                if (!isConnected) {
-                    let handshake = await this.api.tryHandshake(nodeHost, await this.createConnection());
-                    if (!handshake.error) {
-                        this.connectedNodes.push(handshake.data);
-                    }
-                }
-                info.data.nodes.forEach((node: BywiseNode) => {
-                    if (node.isFullNode && node.host) {
-                        if (!testNodes.includes(node.host)) {
-                            testNodes.push(node.host);
+                    let isConnected = false;
+                    this.connectedNodes.forEach(n => {
+                        if (n.host === nodeHost) {
+                            isConnected = true;
+                        }
+                    })
+                    if (!isConnected) {
+                        let handshake = await this.api.tryHandshake(nodeHost, await this.createConnection());
+                        if (!handshake.error) {
+                            this.connectedNodes.push(handshake.data);
                         }
                     }
-                });
+                    info.data.nodes.forEach((node: BywiseNode) => {
+                        if (node.isFullNode && node.host) {
+                            if (!testNodes.includes(node.host)) {
+                                testNodes.push(node.host);
+                            }
+                        }
+                    });
+                }
             }
         }
         if (this.connectedNodes.length > 0) {
@@ -132,6 +134,11 @@ export class NetworkActions {
         } else {
             this.isConnected = false;
             throw new Error('Bywise Web3 - Can\'t connect any node');
+        }
+        if(!this.isDisconnect) {
+            setTimeout(this.updateConnection, 30000);
+        } else {
+            this.isConnected = false;
         }
     }
 

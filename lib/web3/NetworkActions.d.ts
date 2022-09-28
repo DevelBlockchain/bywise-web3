@@ -15,6 +15,7 @@ export declare class NetworkActions {
     readonly api: BywiseApi;
     readonly isMainnet: boolean;
     readonly maxConnectedNodes: number;
+    private isDisconnect;
     isConnected: boolean;
     connectedNodes: BywiseNode[];
     constructor(configs: NetworkConfigs);

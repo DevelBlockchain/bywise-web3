@@ -1,4 +1,4 @@
-import { PublishedTx, Slice } from "../types";
+import { PublishedSlice, PublishedTx, Slice } from "../types";
 import { Web3 } from "./Web3";
 
 export class SlicesActions {
@@ -14,8 +14,8 @@ export class SlicesActions {
         });
     }
 
-    findLastSlices = async (limit: number = 100): Promise<Slice[]> => {
-        let lastSlices: Slice[] = [];
+    findLastSlices = async (limit: number = 100): Promise<PublishedSlice[]> => {
+        let lastSlices: PublishedSlice[] = [];
         let lastSlice = 0;
         await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getSlices(node, { limit });
@@ -33,7 +33,7 @@ export class SlicesActions {
         return lastSlices;
     }
 
-    getSliceByHash = async (sliceHash: string): Promise<Slice | undefined> => {
+    getSliceByHash = async (sliceHash: string): Promise<PublishedSlice | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getSliceByHash(node, sliceHash);
             if (!req.error) {
@@ -42,7 +42,7 @@ export class SlicesActions {
         });
     }
 
-    getSlices = async (parameters: { from?: string, lastBlockHash?: string, offset?: number, limit?: number, asc?: boolean } = {}): Promise<Slice[] | undefined> => {
+    getSlices = async (parameters: { from?: string, lastBlockHash?: string, offset?: number, limit?: number, asc?: boolean } = {}): Promise<PublishedSlice[] | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getSlices(node, parameters);
             if (!req.error) {

@@ -1,11 +1,11 @@
-import { Block, Slice } from "../types";
+import { PublishedBlock, PublishedSlice } from "../types";
 import { Web3 } from "./Web3";
 export declare class BlocksActions {
     private readonly web3;
     constructor(web3: Web3);
-    findLastBlocks: (limit?: number) => Promise<Block[]>;
-    findBlocksFromHeight: (height: number, limit?: number) => Promise<Block[]>;
-    getBlockByHash: (blockHash: string) => Promise<Block | undefined>;
+    findLastBlocks: (limit?: number) => Promise<PublishedBlock[]>;
+    findBlocksFromHeight: (height: number, limit?: number) => Promise<PublishedBlock[]>;
+    getBlockByHash: (blockHash: string) => Promise<PublishedBlock | undefined>;
     getBlocks: (parameters?: {
         height?: number;
         from?: string;
@@ -13,10 +13,10 @@ export declare class BlocksActions {
         offset?: number;
         limit?: number;
         asc?: boolean;
-    }) => Promise<Block[] | undefined>;
+    }) => Promise<PublishedBlock[] | undefined>;
     countBlocks: (parameters?: {
         height?: number;
         from?: string;
     }) => Promise<number | undefined>;
-    getSlicesFromBlock: (sliceHash: string) => Promise<Slice[] | undefined>;
+    getSlicesFromBlock: (sliceHash: string) => Promise<PublishedSlice[] | undefined>;
 }

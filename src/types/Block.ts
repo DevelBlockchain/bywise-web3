@@ -72,3 +72,17 @@ export class Block implements BywiseTransaction, BywisePack {
         if (!BywiseHelper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid block signature');
     }
 }
+
+export type PublishedBlock = {
+    height: number;
+    slices: string[];
+    version: string;
+    from: string;
+    nextSlice: string;
+    nextBlock: string;
+    created: string;
+    lastHash: string;
+    hash: string;
+    sign: string;
+    externalTxID: string[];
+}

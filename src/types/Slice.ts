@@ -67,3 +67,15 @@ export class Slice implements BywiseTransaction, BywisePack {
         if (!BywiseHelper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid slice signature');
     }
 }
+
+export type PublishedSlice = {
+    height: number;
+    transactions: string[];
+    version: string;
+    from: string;
+    next: string;
+    created: string;
+    lastBlockHash: string;
+    hash: string;
+    sign: string;
+}

@@ -1,14 +1,15 @@
 import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx } from '.';
 import { WalletInfo } from '../utils';
-import { Block } from './Block';
+import { PublishedBlock } from './Block';
 import { CountType } from './BywiseNode';
+import { PublishedSlice } from './Slice';
 export declare type BywiseResponse<T> = {
     data: T;
     error?: string;
 };
 export declare class BywiseApi {
     private debug;
-    constructor(debug: boolean);
+    constructor(debug?: boolean);
     private get;
     private post;
     getBlocks(node: BywiseNode, parameters: {
@@ -18,13 +19,13 @@ export declare class BywiseApi {
         offset?: number;
         limit?: number;
         asc?: boolean;
-    }): Promise<BywiseResponse<Block[]>>;
+    }): Promise<BywiseResponse<PublishedBlock[]>>;
     countBlocks(node: BywiseNode, parameters: {
         height?: number;
         from?: string;
     }): Promise<BywiseResponse<CountType>>;
-    getBlockByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<Block>>;
-    getSlicesFromBlock(node: BywiseNode, blockHash: string): Promise<BywiseResponse<Slice[]>>;
+    getBlockByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedBlock>>;
+    getSlicesFromBlock(node: BywiseNode, blockHash: string): Promise<BywiseResponse<PublishedSlice[]>>;
     publishNewSlice(node: BywiseNode, slice: Slice): Promise<BywiseResponse<void>>;
     getSlices(node: BywiseNode, parameters: {
         from?: string;
@@ -32,12 +33,12 @@ export declare class BywiseApi {
         offset?: number;
         limit?: number;
         asc?: boolean;
-    }): Promise<BywiseResponse<Slice[]>>;
+    }): Promise<BywiseResponse<PublishedSlice[]>>;
     countSlices(node: BywiseNode, parameters: {
         from?: string;
         lastBlockHash?: string;
     }): Promise<BywiseResponse<CountType>>;
-    getSliceByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<Slice>>;
+    getSliceByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedSlice>>;
     getTransactionsFromSlice(node: BywiseNode, sliceHash: string): Promise<BywiseResponse<PublishedTx[]>>;
     publishNewTransaction(node: BywiseNode, tx: Tx): Promise<BywiseResponse<void>>;
     getTxs(node: BywiseNode, parameters: {
