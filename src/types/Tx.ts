@@ -22,6 +22,7 @@ export enum TxType {
 
 export class Tx implements BywiseTransaction {
     version: string;
+    chain: string;
     validator?: string;
     from: string[];
     to: string[];
@@ -38,6 +39,7 @@ export class Tx implements BywiseTransaction {
 
     constructor(tx?: Partial<Tx>) {
         this.version = tx?.version ?? '';
+        this.chain = tx?.chain ?? 'mainnet';
         this.validator = tx?.validator;
         this.from = tx?.from ?? [];
         this.to = tx?.to ?? [];
@@ -56,6 +58,9 @@ export class Tx implements BywiseTransaction {
     toHash(): string {
         let bytes = '';
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
+        if(this.version == '2') {
+            bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
+        }
         if (this.validator) {
             bytes += Buffer.from(this.validator, 'utf-8').toString('hex');
         }
@@ -83,7 +88,10 @@ export class Tx implements BywiseTransaction {
     }
 
     isValid(): void {
-        if (this.version !== '1') throw new Error('invalid version ' + this.version);
+        if (this.version !== '1' && this.version !== '2') throw new Error('invalid version ' + this.version);
+        if(this.version == '2') {
+            if (this.chain.length === 0) throw new Error('invalid transaction chain cant be empty');
+        }
         if (this.validator && !BywiseHelper.isValidAddress(this.validator)) throw new Error('invalid transaction validator address ' + this.validator);
         if (this.from.length === 0) throw new Error('invalid transaction sender cant be empty');
         if (this.from.length > 100) throw new Error('maximum number of senders is 100 signatures');

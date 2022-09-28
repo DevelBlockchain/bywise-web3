@@ -1,17 +1,17 @@
 export class BywiseNode {
-    isFullNode: boolean;
     version: string;
-    updated: string;
-    host?: string;
-    address?: string;
+    expire: number;
+    chains: string[];
+    host: string;
+    address: string;
     token?: string;
 
     constructor(config: Partial<BywiseNode>) {
-        this.isFullNode = config.isFullNode ? config.isFullNode : false;
-        this.version = config.version ? config.version : '1';
-        this.updated = config.updated ? config.updated : new Date().toISOString();
-        this.host = config.host;
-        this.address = config.address;
+        this.version = config.version ?? '';
+        this.expire = config.expire ?? 0;
+        this.chains = config.chains ?? [];
+        this.host = config.host ?? '';
+        this.address = config.address ?? '';
         this.token = config.token;
     }
 }
@@ -24,12 +24,11 @@ export type ConfigNode = {
 
 export type InfoNode = {
     address: string;
-    host?: string;
+    host: string;
     version: string;
     timestamp: string;
-    isFullNode: boolean;
-    nodesLimit: number;
-    explorer: string;
+    chains: string[];
+    explorers: string[];
     nodes: BywiseNode[];
     configs: ConfigNode[];
 }

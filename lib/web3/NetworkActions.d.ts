@@ -25,9 +25,7 @@ export declare class NetworkActions {
         connectedNodes: BywiseNode[];
     };
     importConnections: (payload: any) => Promise<void>;
-    connect: () => Promise<void>;
-    disconnect: () => void;
-    private updateConnection;
+    tryConnection: () => Promise<number | undefined>;
     getRandomNode: () => BywiseNode;
     sendAll(sendAction: SendAction): Promise<boolean>;
     findAll<T>(filterAction: FilterAction<T>): Promise<T | undefined>;

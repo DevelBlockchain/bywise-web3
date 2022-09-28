@@ -6,6 +6,7 @@ export class Block implements BywiseTransaction, BywisePack {
     height: number;
     slices: string[];
     version: string;
+    chain: string;
     from: string;
     nextSlice: string;
     nextBlock: string;
@@ -19,6 +20,7 @@ export class Block implements BywiseTransaction, BywisePack {
         this.height = block?.height ?? 0;
         this.slices = block?.slices ?? [];
         this.version = block?.version ?? '';
+        this.chain = block?.chain ?? '';
         this.from = block?.from ?? '';
         this.nextSlice = block?.nextSlice ?? '';
         this.nextBlock = block?.nextBlock ?? '';
@@ -46,6 +48,9 @@ export class Block implements BywiseTransaction, BywisePack {
         let bytes = '';
         bytes += BywiseHelper.numberToHex(this.height);
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
+        if(this.version == '2') {
+            bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
+        }
         bytes += Buffer.from(this.from, 'utf-8').toString('hex');
         bytes += Buffer.from(this.nextSlice, 'utf-8').toString('hex');
         bytes += Buffer.from(this.nextBlock, 'utf-8').toString('hex');
@@ -62,7 +67,10 @@ export class Block implements BywiseTransaction, BywisePack {
             let sliceHash = this.slices[i];
             if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid slice hash ${i} - ${sliceHash}`);
         }
-        if (this.version !== '1') throw new Error('invalid block version ' + this.version);
+        if (this.version !== '1' && this.version !== '2') throw new Error('invalid block version ' + this.version);
+        if(this.version == '2') {
+            if (this.chain.length === 0) throw new Error('invalid block chain cant be empty');
+        }
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid block from address ' + this.from);
         if (!BywiseHelper.isValidAddress(this.nextSlice)) throw new Error('invalid block nextSlice address ' + this.nextSlice);
         if (!BywiseHelper.isValidAddress(this.nextBlock)) throw new Error('invalid block nextBlock address ' + this.nextBlock);

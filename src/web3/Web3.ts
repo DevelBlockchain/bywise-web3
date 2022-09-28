@@ -8,7 +8,7 @@ import { TransactionsActions } from "./TransactionsActions";
 
 const defaultNetwork: { mainnet: Network, testnet: Network } = {
     mainnet: {
-        isMainnet: true,
+        chain: 'mainnet',
         nodes: [
             'https://node0.bywise.org',
             'https://node1.bywise.org',
@@ -16,7 +16,7 @@ const defaultNetwork: { mainnet: Network, testnet: Network } = {
         explorer: 'https://explorer.bywise.org'
     },
     testnet: {
-        isMainnet: false,
+        chain: 'testnet',
         nodes: [
             'https://n0.bywise.org',
             'https://n1.bywise.org',
@@ -33,30 +33,27 @@ export class Web3 {
     public readonly slices: SlicesActions;
     private readonly debug: boolean = false;
 
-    constructor(configs?: { isMainnet?: boolean, network?: Network, maxConnectedNodes?: number, createConnection?: () => Promise<BywiseNode>, debug?: boolean }) {
-        if(configs) {
+    constructor(configs?: { networks?: Network[], maxConnectedNodes?: number, createConnection?: () => Promise<BywiseNode>, debug?: boolean }) {
+        if (configs) {
             this.debug = configs.debug ? configs.debug : false;
         }
         let networkConfigs: NetworkConfigs = {
-            isMainnet: true,
-            network: defaultNetwork.mainnet,
+            networks: [defaultNetwork.mainnet, defaultNetwork.testnet],
+            isClient: false,
             maxConnectedNodes: 10,
             createConnection: undefined,
             debug: this.debug,
         }
         if (configs) {
             if (configs.maxConnectedNodes) {
-                networkConfigs.maxConnectedNodes = configs.maxConnectedNodes
+                networkConfigs.maxConnectedNodes = configs.maxConnectedNodes;
             }
             if (configs.createConnection) {
-                networkConfigs.createConnection = configs.createConnection
+                networkConfigs.createConnection = configs.createConnection;
+                networkConfigs.isClient = false;
             }
-            if (configs.network) {
-                networkConfigs.network = configs.network;
-            } else {
-                if (configs.isMainnet === false) {
-                    networkConfigs.network = defaultNetwork.testnet;
-                }
+            if (configs.networks) {
+                networkConfigs.networks = configs.networks;
             }
         }
         this.network = new NetworkActions(networkConfigs);

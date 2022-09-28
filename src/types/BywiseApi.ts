@@ -41,7 +41,7 @@ export class BywiseApi {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
-                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error.message}`;
+                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error}`;
             }
         }
         if (this.debug) {
@@ -70,7 +70,7 @@ export class BywiseApi {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
-                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error.message}`;
+                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error}`;
             }
         }
         if (this.debug) {
@@ -188,7 +188,7 @@ export class BywiseApi {
         return this.get(`${node.host}/api/v1/wallets/count`, node.token);
     }
 
-    tryToken(node: BywiseNode): Promise<BywiseResponse<void>> {
+    tryToken(node: BywiseNode): Promise<BywiseResponse<InfoNode>> {
         return this.get(`${node.host}/api/v1/nodes/try-token`, node.token);
     }
 
@@ -196,7 +196,7 @@ export class BywiseApi {
         return this.get(`${host}/api/v1/nodes/info`, undefined);
     }
 
-    tryHandshake(host: string, myNode: BywiseNode): Promise<BywiseResponse<BywiseNode>> {
-        return this.post(`${host}/api/v1/nodes/handshake`, undefined, myNode);
+    tryHandshake(host: string, myNode?: BywiseNode): Promise<BywiseResponse<BywiseNode>> {
+        return this.post(`${host}/api/v1/nodes/handshake`, undefined, myNode ?? {});
     }
 }
