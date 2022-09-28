@@ -1,4 +1,4 @@
-import { Network, BywiseNode } from "../types";
+import { Network, BywiseNode, BywiseApiV2 } from "../types";
 import { WalletsActions } from "./WalletsActions";
 import { BlocksActions } from "./BlocksActions";
 import { NetworkActions, NetworkConfigs } from "./NetworkActions";
@@ -32,6 +32,11 @@ export class Web3 {
     public readonly blocks: BlocksActions;
     public readonly slices: SlicesActions;
     private readonly debug: boolean = false;
+
+    static async tryToken(node: BywiseNode) {
+        const api = new BywiseApiV2();
+        return await api.tryToken(node);
+    }
 
     constructor(configs?: { networks?: Network[], maxConnectedNodes?: number, myHost?: string, createConnection?: () => Promise<BywiseNode>, debug?: boolean }) {
         if (configs) {

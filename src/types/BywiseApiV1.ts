@@ -1,8 +1,7 @@
 import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx } from '.';
 import { WalletInfo } from '../utils';
-import { Block, PublishedBlock } from './Block';
-import { ConfigNode, CountType } from './BywiseNode';
-import { PublishedSlice } from './Slice';
+import { Block } from './Block';
+import { CountType } from './BywiseNode';
 const axios = require('axios');
 
 export type BywiseResponse<T> = {
@@ -10,12 +9,12 @@ export type BywiseResponse<T> = {
     error?: string;
 }
 
-export class BywiseApi {
+export class BywiseApiV1 {
 
     private debug: boolean;
 
-    constructor(debug?: boolean) {
-        this.debug = debug !== undefined ? debug : false;
+    constructor(debug: boolean) {
+        this.debug = debug;
     }
 
     private async get(url: string, token: string | undefined, parameters: any = {}): Promise<BywiseResponse<any>> {
@@ -41,7 +40,7 @@ export class BywiseApi {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
-                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error}`;
+                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error.message}`;
             }
         }
         if (this.debug) {
@@ -70,7 +69,7 @@ export class BywiseApi {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
-                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error}`;
+                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error.message}`;
             }
         }
         if (this.debug) {
@@ -82,11 +81,7 @@ export class BywiseApi {
         return response;
     }
 
-    getConfigs(node: BywiseNode, chain: string): Promise<BywiseResponse<ConfigNode[]>> {
-        return this.get(`${node.host}/api/v2/configs/${chain}`, node.token);
-    }
-
-    getBlocks(node: BywiseNode, parameters: { height?: number, from?: string, lastHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedBlock[]>> {
+    getBlocks(node: BywiseNode, parameters: { height?: number, from?: string, lastHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<Block[]>> {
         let query: any = {};
         if (parameters.height !== undefined) query.height = parameters.height
         if (parameters.from !== undefined) query.from = parameters.from
@@ -104,11 +99,11 @@ export class BywiseApi {
         return this.get(`${node.host}/api/v1/blocks/count`, node.token, query);
     }
 
-    getBlockByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedBlock>> {
+    getBlockByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<Block>> {
         return this.get(`${node.host}/api/v1/blocks/${hash}`, node.token);
     }
 
-    getSlicesFromBlock(node: BywiseNode, blockHash: string): Promise<BywiseResponse<PublishedSlice[]>> {
+    getSlicesFromBlock(node: BywiseNode, blockHash: string): Promise<BywiseResponse<Slice[]>> {
         return this.get(`${node.host}/api/v1/blocks/${blockHash}/slices`, node.token);
     }
 
@@ -116,7 +111,7 @@ export class BywiseApi {
         return this.post(`${node.host}/api/v1/slices`, node.token, slice);
     }
 
-    getSlices(node: BywiseNode, parameters: { from?: string, lastBlockHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedSlice[]>> {
+    getSlices(node: BywiseNode, parameters: { from?: string, lastBlockHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<Slice[]>> {
         let query: any = {};
         if (parameters.from !== undefined) query.from = parameters.from
         if (parameters.lastBlockHash !== undefined) query.lastBlockHash = parameters.lastBlockHash
@@ -133,7 +128,7 @@ export class BywiseApi {
         return this.get(`${node.host}/api/v1/slices/count`, node.token, query);
     }
 
-    getSliceByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedSlice>> {
+    getSliceByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<Slice>> {
         return this.get(`${node.host}/api/v1/slices/${hash}`, node.token);
     }
 
@@ -192,7 +187,7 @@ export class BywiseApi {
         return this.get(`${node.host}/api/v1/wallets/count`, node.token);
     }
 
-    tryToken(node: BywiseNode): Promise<BywiseResponse<InfoNode>> {
+    tryToken(node: BywiseNode): Promise<BywiseResponse<void>> {
         return this.get(`${node.host}/api/v1/nodes/try-token`, node.token);
     }
 
@@ -200,7 +195,7 @@ export class BywiseApi {
         return this.get(`${host}/api/v1/nodes/info`, undefined);
     }
 
-    tryHandshake(host: string, myNode?: BywiseNode): Promise<BywiseResponse<BywiseNode>> {
-        return this.post(`${host}/api/v1/nodes/handshake`, undefined, myNode ?? {});
+    tryHandshake(host: string, myNode: BywiseNode): Promise<BywiseResponse<BywiseNode>> {
+        return this.post(`${host}/api/v1/nodes/handshake`, undefined, myNode);
     }
 }

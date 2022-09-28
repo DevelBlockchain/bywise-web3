@@ -11,6 +11,7 @@ export declare class Web3 {
     readonly blocks: BlocksActions;
     readonly slices: SlicesActions;
     private readonly debug;
+    static tryToken(node: BywiseNode): Promise<import("../types").BywiseResponse<import("../types").InfoNode>>;
     constructor(configs?: {
         networks?: Network[];
         maxConnectedNodes?: number;

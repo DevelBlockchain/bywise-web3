@@ -1,4 +1,4 @@
-import { BywiseApi, BywiseNode, BywiseResponse, Network } from "../types";
+import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse, Network } from "../types";
 const randomstring = require("randomstring");
 
 export type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>
@@ -16,7 +16,8 @@ export type NetworkConfigs = {
 export class NetworkActions {
     private readonly networks: Network[];
     private readonly chains: string[];
-    public readonly api: BywiseApi;
+    public readonly api: BywiseApiV2;
+    public readonly apiv1: BywiseApiV1;
     public readonly isClient: boolean;
     public readonly myHost: string;
     public readonly maxConnectedNodes: number;
@@ -25,7 +26,8 @@ export class NetworkActions {
 
     constructor(configs: NetworkConfigs) {
         this.maxConnectedNodes = configs.maxConnectedNodes;
-        this.api = new BywiseApi(configs.debug);
+        this.apiv1 = new BywiseApiV1(configs.debug);
+        this.api = new BywiseApiV2(configs.debug);
         this.networks = configs.networks;
         this.myHost = configs.myHost;
         this.isClient = configs.isClient;

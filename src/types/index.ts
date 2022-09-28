@@ -1,5 +1,6 @@
 export * from './Block';
-export * from './BywiseApi';
+export * from './BywiseApiV1';
+export * from './BywiseApiV2';
 export * from './BywiseNode';
 export * from './BywisePack';
 export * from './BywiseTransaction';

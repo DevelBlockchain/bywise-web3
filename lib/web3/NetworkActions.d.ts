@@ -1,4 +1,4 @@
-import { BywiseApi, BywiseNode, BywiseResponse, Network } from "../types";
+import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse, Network } from "../types";
 export declare type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>;
 export declare type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
 export declare type NetworkConfigs = {
@@ -12,7 +12,8 @@ export declare type NetworkConfigs = {
 export declare class NetworkActions {
     private readonly networks;
     private readonly chains;
-    readonly api: BywiseApi;
+    readonly api: BywiseApiV2;
+    readonly apiv1: BywiseApiV1;
     readonly isClient: boolean;
     readonly myHost: string;
     readonly maxConnectedNodes: number;
