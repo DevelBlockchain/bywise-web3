@@ -108,7 +108,7 @@ export class NetworkActions {
             const host = knowHosts[i];
 
             let found = false;
-            if(host === this.myHost) {
+            if (host === this.myHost) {
                 found = true;
             }
             this.connectedNodes.forEach(n => {
@@ -133,6 +133,7 @@ export class NetworkActions {
             }
             let handshake = await this.api.tryHandshake(host, myNode);
             if (!handshake.error) {
+                handshake.data.host = host;
                 this.connectedNodes.push(handshake.data);
             }
             if (this.connectedNodes.length >= this.maxConnectedNodes) {
@@ -157,6 +158,9 @@ export class NetworkActions {
     }
 
     addNode = (node: BywiseNode) => {
+        if (node.host === this.myHost) {
+            return;
+        }
         for (let i = 0; i < this.connectedNodes.length; i++) {
             const connectedNode = this.connectedNodes[i];
             if (connectedNode.host === node.host) {

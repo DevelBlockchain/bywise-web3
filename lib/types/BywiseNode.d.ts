@@ -1,9 +1,9 @@
 export declare class BywiseNode {
     version: string;
-    expire: number;
     chains: string[];
     host: string;
     address: string;
+    expire?: number;
     token?: string;
     constructor(config: Partial<BywiseNode>);
 }

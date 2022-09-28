@@ -1,17 +1,17 @@
 export class BywiseNode {
     version: string;
-    expire: number;
     chains: string[];
     host: string;
     address: string;
+    expire?: number;
     token?: string;
 
     constructor(config: Partial<BywiseNode>) {
         this.version = config.version ?? '';
-        this.expire = config.expire ?? 0;
         this.chains = config.chains ?? [];
         this.host = config.host ?? '';
         this.address = config.address ?? '';
+        this.expire = config.expire;
         this.token = config.token;
     }
 }
