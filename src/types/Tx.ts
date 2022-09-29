@@ -58,7 +58,7 @@ export class Tx implements BywiseTransaction {
     toHash(): string {
         let bytes = '';
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
-        if(this.version == '2') {
+        if (this.version == '2') {
             bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
         }
         if (this.validator) {
@@ -83,13 +83,17 @@ export class Tx implements BywiseTransaction {
             })
         }
         bytes += Buffer.from(this.created, 'utf-8').toString('hex');
-        bytes = BywiseHelper.makeHash(bytes);
+        if (this.version == '1') {
+            bytes = BywiseHelper.makeHashV1(bytes);
+        } else {
+            bytes = BywiseHelper.makeHash(bytes);
+        }
         return bytes;
     }
 
     isValid(): void {
         if (this.version !== '1' && this.version !== '2') throw new Error('invalid version ' + this.version);
-        if(this.version == '2') {
+        if (this.version == '2') {
             if (this.chain.length === 0) throw new Error('invalid transaction chain cant be empty');
             if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
@@ -177,7 +181,7 @@ export type PublishedTx = {
     hash: string;
     validatorSign?: string;
     sign: string[];
-    
+
     status: string;
     output: TxOutput;
 }

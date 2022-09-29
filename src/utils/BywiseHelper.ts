@@ -6,13 +6,17 @@ const ethereum_address = require('ethereum-address');
 export class BywiseHelper {
     static readonly ZERO_ADDRESS = 'BWS000000000000000000000000000000000000000000000';
 
-    static makeHash(hexBytes: string) {
+    static makeHashV1(hexBytes: string) {
         return base16Encode(sha256(base16Decode(hexBytes))).toLowerCase();
     }
+    
+    static makeHash(hexBytes: string) {
+        return base16Encode(sha256(sha256(base16Decode(hexBytes)))).toLowerCase();
+    }
 
-    static encodeBWSAddress = (isMainnet: boolean, isContract: boolean, ethAddress: string, tag?: string) => {
+    static encodeBWSAddress = (isContract: boolean, ethAddress: string, tag?: string) => {
         let finalAddress = 'BWS1';
-        finalAddress += isMainnet ? 'M' : 'T';
+        finalAddress += 'M';
         finalAddress += isContract ? 'C' : 'U';
         finalAddress += ethAddress.substring(2);
         if (tag) {
@@ -30,7 +34,6 @@ export class BywiseHelper {
         if (address === BywiseHelper.ZERO_ADDRESS) {
             return new InfoAddress({
                 version: '1',
-                isMainnet: false,
                 isContract: false,
                 ethAddress: '0x0000000000000000000000000000000000000000',
                 tag: '',
@@ -46,7 +49,6 @@ export class BywiseHelper {
         if(!ethereum_address.isAddress(ethAddress)) throw new Error('invalid address parameters');
         return new InfoAddress({
             version: '1',
-            isMainnet,
             isContract,
             ethAddress,
             tag,

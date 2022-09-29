@@ -19,7 +19,7 @@ export class Wallet {
     }
 
     getAddress = (tag = ''): string => {
-        return BywiseHelper.encodeBWSAddress(true, false, this.account.address, tag);
+        return BywiseHelper.encodeBWSAddress(false, this.account.address, tag);
     }
 
     signHash = async (hash: string): Promise<string> => {

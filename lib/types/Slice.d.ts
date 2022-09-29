@@ -11,6 +11,7 @@ export declare class Slice implements BywiseTransaction, BywisePack {
     hash: string;
     sign: string;
     constructor(slice?: Partial<Slice>);
+    validatorHash(): string;
     getMerkleRoot(): string;
     toHash(): string;
     isValid(): void;

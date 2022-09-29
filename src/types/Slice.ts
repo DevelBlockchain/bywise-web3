@@ -25,6 +25,15 @@ export class Slice implements BywiseTransaction, BywisePack {
         this.sign = slice?.sign ?? '';
     }
 
+    validatorHash() {
+        let bytes = '';
+        bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
+        bytes += BywiseHelper.numberToHex(this.height);
+        bytes += this.lastBlockHash;
+        bytes = BywiseHelper.makeHash(bytes);
+        return bytes;
+    }
+
     getMerkleRoot() {
         let merkleRoot = '';
         if (this.transactions.length > 0) {
@@ -52,7 +61,11 @@ export class Slice implements BywiseTransaction, BywisePack {
         bytes += Buffer.from(this.created, 'utf-8').toString('hex');
         bytes += this.getMerkleRoot();
         bytes += this.lastBlockHash;
-        bytes = BywiseHelper.makeHash(bytes);
+        if (this.version == '1') {
+            bytes = BywiseHelper.makeHashV1(bytes);
+        } else {
+            bytes = BywiseHelper.makeHash(bytes);
+        }
         return bytes;
     }
 

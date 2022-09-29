@@ -12,6 +12,7 @@ export declare class Block implements BywiseTransaction, BywisePack {
     sign: string;
     externalTxID: string[];
     constructor(block?: Partial<Block>);
+    validatorHash(): string;
     getMerkleRoot(): string;
     toHash(): string;
     isValid(): void;

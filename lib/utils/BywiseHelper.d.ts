@@ -1,8 +1,9 @@
 import { InfoAddress } from '../types/InfoAddress';
 export declare class BywiseHelper {
     static readonly ZERO_ADDRESS = "BWS000000000000000000000000000000000000000000000";
+    static makeHashV1(hexBytes: string): string;
     static makeHash(hexBytes: string): string;
-    static encodeBWSAddress: (isMainnet: boolean, isContract: boolean, ethAddress: string, tag?: string | undefined) => string;
+    static encodeBWSAddress: (isContract: boolean, ethAddress: string, tag?: string | undefined) => string;
     static decodeBWSAddress: (address: string) => InfoAddress;
     static getAddressTag: (address: string) => string;
     static isZeroAddress: (address: string) => boolean;

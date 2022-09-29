@@ -27,6 +27,14 @@ export class Block implements BywiseTransaction, BywisePack {
         this.externalTxID = block?.externalTxID ?? [];
     }
 
+    validatorHash() {
+        let bytes = '';
+        bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
+        bytes += BywiseHelper.numberToHex(this.height);
+        bytes = BywiseHelper.makeHash(bytes);
+        return bytes;
+    }
+
     getMerkleRoot() {
         let merkleRoot = '';
         if (this.slices.length > 0) {
@@ -55,7 +63,11 @@ export class Block implements BywiseTransaction, BywisePack {
         bytes += Buffer.from(this.created, 'utf-8').toString('hex');
         bytes += this.getMerkleRoot();
         bytes += this.lastHash;
-        bytes = BywiseHelper.makeHash(bytes);
+        if (this.version == '1') {
+            bytes = BywiseHelper.makeHashV1(bytes);
+        } else {
+            bytes = BywiseHelper.makeHash(bytes);
+        }
         return bytes;
     }
 
