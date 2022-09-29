@@ -91,6 +91,7 @@ export class Tx implements BywiseTransaction {
         if (this.version !== '1' && this.version !== '2') throw new Error('invalid version ' + this.version);
         if(this.version == '2') {
             if (this.chain.length === 0) throw new Error('invalid transaction chain cant be empty');
+            if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
         if (this.validator && !BywiseHelper.isValidAddress(this.validator)) throw new Error('invalid transaction validator address ' + this.validator);
         if (this.from.length === 0) throw new Error('invalid transaction sender cant be empty');

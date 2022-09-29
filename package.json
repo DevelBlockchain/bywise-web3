@@ -1,6 +1,6 @@
 {
   "name": "@bywise/web3",
-  "version": "0.9.32",
+  "version": "0.9.33",
   "description": "Web3 connector of Bywise",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

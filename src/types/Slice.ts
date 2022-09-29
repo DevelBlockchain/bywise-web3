@@ -8,7 +8,6 @@ export class Slice implements BywiseTransaction, BywisePack {
     version: string;
     chain: string;
     from: string;
-    next: string;
     created: string;
     lastBlockHash: string;
     hash: string;
@@ -20,7 +19,6 @@ export class Slice implements BywiseTransaction, BywisePack {
         this.version = slice?.version ?? '';
         this.chain = slice?.chain ?? '';
         this.from = slice?.from ?? '';
-        this.next = slice?.next ?? '';
         this.created = slice?.created ?? '';
         this.lastBlockHash = slice?.lastBlockHash ?? '';
         this.hash = slice?.hash ?? '';
@@ -48,7 +46,9 @@ export class Slice implements BywiseTransaction, BywisePack {
             bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
         }
         bytes += Buffer.from(this.from, 'utf-8').toString('hex');
-        bytes += Buffer.from(this.next, 'utf-8').toString('hex');
+        if(this.version == '1') {
+            bytes += Buffer.from(this.from, 'utf-8').toString('hex'); // next
+        }
         bytes += Buffer.from(this.created, 'utf-8').toString('hex');
         bytes += this.getMerkleRoot();
         bytes += this.lastBlockHash;
@@ -66,9 +66,9 @@ export class Slice implements BywiseTransaction, BywisePack {
         if (this.version !== '1' && this.version !== '2') throw new Error('invalid slice version ' + this.version);
         if(this.version == '2') {
             if (this.chain.length === 0) throw new Error('invalid slice chain cant be empty');
+            if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid slice from address ' + this.from);
-        if (!BywiseHelper.isValidAddress(this.next)) throw new Error('invalid slice next address ' + this.next);
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid slice created date ' + this.created);
         if (!BywiseHelper.isValidHash(this.lastBlockHash)) throw new Error('invalid lastBlockHash ' + this.lastBlockHash);
         if (this.hash !== this.toHash()) throw new Error(`invalid slice hash ${this.hash} ${this.toHash()}`);
@@ -81,7 +81,6 @@ export type PublishedSlice = {
     transactions: string[];
     version: string;
     from: string;
-    next: string;
     created: string;
     lastBlockHash: string;
     hash: string;

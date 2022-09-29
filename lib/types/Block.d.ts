@@ -6,8 +6,6 @@ export declare class Block implements BywiseTransaction, BywisePack {
     version: string;
     chain: string;
     from: string;
-    nextSlice: string;
-    nextBlock: string;
     created: string;
     lastHash: string;
     hash: string;
@@ -23,8 +21,6 @@ export declare type PublishedBlock = {
     slices: string[];
     version: string;
     from: string;
-    nextSlice: string;
-    nextBlock: string;
     created: string;
     lastHash: string;
     hash: string;

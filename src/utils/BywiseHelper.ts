@@ -66,7 +66,7 @@ export class BywiseHelper {
     }
 
     static isValidAmount = (amount: string) => {
-        return /^((0|[1-9][0-9]{0,17})(\.0|\.[0-9]{0,17}[1-9])?)$/.test(amount);
+        return /^((0|[1-9][0-9]{0,24})(\.[0-9]{0,24})?)$/.test(amount);
     }
 
     static isValidAlfaNum = (value: string) => {

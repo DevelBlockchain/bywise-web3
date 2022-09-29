@@ -8,8 +8,6 @@ export class Block implements BywiseTransaction, BywisePack {
     version: string;
     chain: string;
     from: string;
-    nextSlice: string;
-    nextBlock: string;
     created: string;
     lastHash: string;
     hash: string;
@@ -22,8 +20,6 @@ export class Block implements BywiseTransaction, BywisePack {
         this.version = block?.version ?? '';
         this.chain = block?.chain ?? '';
         this.from = block?.from ?? '';
-        this.nextSlice = block?.nextSlice ?? '';
-        this.nextBlock = block?.nextBlock ?? '';
         this.created = block?.created ?? '';
         this.lastHash = block?.lastHash ?? '';
         this.hash = block?.hash ?? '';
@@ -52,8 +48,10 @@ export class Block implements BywiseTransaction, BywisePack {
             bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
         }
         bytes += Buffer.from(this.from, 'utf-8').toString('hex');
-        bytes += Buffer.from(this.nextSlice, 'utf-8').toString('hex');
-        bytes += Buffer.from(this.nextBlock, 'utf-8').toString('hex');
+        if(this.version == '1') {
+            bytes += Buffer.from(this.from, 'utf-8').toString('hex'); // nextSlice
+            bytes += Buffer.from(this.from, 'utf-8').toString('hex'); // nextBlock
+        }
         bytes += Buffer.from(this.created, 'utf-8').toString('hex');
         bytes += this.getMerkleRoot();
         bytes += this.lastHash;
@@ -70,10 +68,9 @@ export class Block implements BywiseTransaction, BywisePack {
         if (this.version !== '1' && this.version !== '2') throw new Error('invalid block version ' + this.version);
         if(this.version == '2') {
             if (this.chain.length === 0) throw new Error('invalid block chain cant be empty');
+            if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid block from address ' + this.from);
-        if (!BywiseHelper.isValidAddress(this.nextSlice)) throw new Error('invalid block nextSlice address ' + this.nextSlice);
-        if (!BywiseHelper.isValidAddress(this.nextBlock)) throw new Error('invalid block nextBlock address ' + this.nextBlock);
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid block created date ' + this.created);
         if (!BywiseHelper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);
         if (this.hash !== this.toHash()) throw new Error(`invalid block hash ${this.hash} ${this.toHash()}`);
@@ -86,8 +83,6 @@ export type PublishedBlock = {
     slices: string[];
     version: string;
     from: string;
-    nextSlice: string;
-    nextBlock: string;
     created: string;
     lastHash: string;
     hash: string;
