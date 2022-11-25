@@ -1,7 +1,6 @@
-import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx } from '.';
+import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse } from '.';
 import { WalletInfo } from '../utils';
-import { PublishedBlock } from './Block';
-import { BywiseResponse } from './BywiseApiV1';
+import { Block, PublishedBlock } from './Block';
 import { ConfigNode, CountType } from './BywiseNode';
 import { PublishedSlice } from './Slice';
 const axios = require('axios');
@@ -80,6 +79,10 @@ export class BywiseApiV2 {
 
     getConfigs(node: BywiseNode, chain: string): Promise<BywiseResponse<ConfigNode[]>> {
         return this.get(`${node.host}/api/v2/configs/${chain}`, node.token);
+    }
+
+    publishNewBlock(node: BywiseNode, block: Block): Promise<BywiseResponse<void>> {
+        return this.post(`${node.host}/api/v2/blocks`, node.token, block);
     }
 
     getBlocks(node: BywiseNode, parameters: { height?: number, from?: string, lastHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedBlock[]>> {

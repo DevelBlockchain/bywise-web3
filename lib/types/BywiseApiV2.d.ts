@@ -1,7 +1,6 @@
-import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx } from '.';
+import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse } from '.';
 import { WalletInfo } from '../utils';
-import { PublishedBlock } from './Block';
-import { BywiseResponse } from './BywiseApiV1';
+import { Block, PublishedBlock } from './Block';
 import { ConfigNode, CountType } from './BywiseNode';
 import { PublishedSlice } from './Slice';
 export declare class BywiseApiV2 {
@@ -10,6 +9,7 @@ export declare class BywiseApiV2 {
     private get;
     private post;
     getConfigs(node: BywiseNode, chain: string): Promise<BywiseResponse<ConfigNode[]>>;
+    publishNewBlock(node: BywiseNode, block: Block): Promise<BywiseResponse<void>>;
     getBlocks(node: BywiseNode, parameters: {
         height?: number;
         from?: string;

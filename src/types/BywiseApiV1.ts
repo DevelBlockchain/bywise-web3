@@ -1,13 +1,8 @@
-import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx } from '.';
+import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse } from '.';
 import { WalletInfo } from '../utils';
 import { Block } from './Block';
 import { CountType } from './BywiseNode';
 const axios = require('axios');
-
-export type BywiseResponse<T> = {
-    data: T;
-    error?: string;
-}
 
 export class BywiseApiV1 {
 
