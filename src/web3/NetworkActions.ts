@@ -7,15 +7,15 @@ export type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>
 export type NetworkConfigs = {
     isClient: boolean,
     myHost: string,
-    networks: Network[],
+    initialNodes: string[],
     maxConnectedNodes: number,
     createConnection?: () => Promise<BywiseNode>
+    getChains?: () => Promise<string[]>
     debug: boolean,
 };
 
 export class NetworkActions {
-    private readonly networks: Network[];
-    private readonly chains: string[];
+    public readonly initialNodes: string[];
     public readonly api: BywiseApiV2;
     public readonly apiv1: BywiseApiV1;
     public readonly isClient: boolean;
@@ -28,26 +28,23 @@ export class NetworkActions {
         this.maxConnectedNodes = configs.maxConnectedNodes;
         this.apiv1 = new BywiseApiV1(configs.debug);
         this.api = new BywiseApiV2(configs.debug);
-        this.networks = configs.networks;
+        this.initialNodes = configs.initialNodes;
         this.myHost = configs.myHost;
         this.isClient = configs.isClient;
-        if (this.networks.length == 0) {
-            throw new Error(`networks cant be empty`)
-        }
-        this.chains = [];
-        for (let i = 0; i < this.networks.length; i++) {
-            const networks = this.networks[i];
-            if (!this.chains.includes(networks.chain)) {
-                this.chains.push(networks.chain);
-            }
-        }
         if (configs.createConnection) {
             this.createConnection = configs.createConnection
+        }
+        if (configs.getChains) {
+            this.getChains = configs.getChains
         }
     }
 
     private createConnection = async () => {
         return new BywiseNode({});
+    }
+    
+    private getChains = async (): Promise<string[]>=> {
+        return [];
     }
 
     exportConnections = () => {
@@ -64,20 +61,17 @@ export class NetworkActions {
     }
 
     private async populateKnowHosts(knowHosts: string[]) {
-        for (let i = 0; i < this.networks.length; i++) {
-            const network = this.networks[i];
-            network.nodes.forEach(host => {
-                if (!knowHosts.includes(host)) {
-                    knowHosts.push(host);
-                }
-            })
-        }
+        this.initialNodes.forEach(host => {
+            if (!knowHosts.includes(host)) {
+                knowHosts.push(host);
+            }
+        })
     }
 
-    private includesChain(node: BywiseNode): boolean {
+    private async includesChain(node: BywiseNode) {
         for (let i = 0; i < node.chains.length; i++) {
             const chain = node.chains[i];
-            if (this.chains.includes(chain)) {
+            if ((await this.getChains()).includes(chain)) {
                 return true;
             }
         }
@@ -94,10 +88,8 @@ export class NetworkActions {
                 const nodes = req.data.nodes;
                 for (let j = 0; j < nodes.length; j++) {
                     const knowNode = nodes[j];
-                    if (this.includesChain(knowNode)) {
-                        if (!knowHosts.includes(knowNode.host)) {
-                            knowHosts.push(knowNode.host);
-                        }
+                    if (!knowHosts.includes(knowNode.host)) {
+                        knowHosts.push(knowNode.host);
                     }
                 }
             }
@@ -145,16 +137,17 @@ export class NetworkActions {
     }
 
     tryConnection = async () => {
+        this.isConnected = false;
         let knowHosts: string[] = [];
         await this.populateKnowHosts(knowHosts);
+        if(knowHosts.length === 0) {
+            this.isConnected = true;
+        }
         await this.excludeOfflineNodesAndUpdateKnowHosts(knowHosts);
         knowHosts = await this.removeConnectedNodes(knowHosts);
         await this.tryConnecteKnowNodes(knowHosts);
-
         if (this.connectedNodes.length > 0) {
             this.isConnected = true;
-        } else {
-            this.isConnected = false;
         }
         return this.connectedNodes.length;
     }

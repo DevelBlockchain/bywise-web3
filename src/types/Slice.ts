@@ -98,4 +98,5 @@ export type PublishedSlice = {
     lastBlockHash: string;
     hash: string;
     sign: string;
+    status: string;
 }

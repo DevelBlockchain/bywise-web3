@@ -38,6 +38,7 @@ export declare class Tx implements BywiseTransaction {
     isValid(): void;
 }
 export declare type SimulateTx = {
+    chain: string;
     from: string[] | string;
     to: string[] | string;
     amount: string[] | string;

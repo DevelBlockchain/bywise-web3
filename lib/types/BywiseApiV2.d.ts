@@ -1,4 +1,4 @@
-import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse } from '.';
+import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse, BlockPack } from '.';
 import { WalletInfo } from '../utils';
 import { Block, PublishedBlock } from './Block';
 import { ConfigNode, CountType } from './BywiseNode';
@@ -11,22 +11,27 @@ export declare class BywiseApiV2 {
     getConfigs(node: BywiseNode, chain: string): Promise<BywiseResponse<ConfigNode[]>>;
     publishNewBlock(node: BywiseNode, block: Block): Promise<BywiseResponse<void>>;
     getBlocks(node: BywiseNode, parameters: {
-        height?: number;
+        height?: any;
+        status?: string;
         from?: string;
         lastHash?: string;
         offset?: number;
         limit?: number;
         asc?: boolean;
+        chain?: string;
     }): Promise<BywiseResponse<PublishedBlock[]>>;
     countBlocks(node: BywiseNode, parameters: {
         height?: number;
         from?: string;
     }): Promise<BywiseResponse<CountType>>;
     getBlockByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedBlock>>;
+    getBlockPackByHeight(node: BywiseNode, chain: string, height: number): Promise<BywiseResponse<BlockPack>>;
     getSlicesFromBlock(node: BywiseNode, blockHash: string): Promise<BywiseResponse<PublishedSlice[]>>;
     publishNewSlice(node: BywiseNode, slice: Slice): Promise<BywiseResponse<void>>;
     getSlices(node: BywiseNode, parameters: {
         from?: string;
+        chain?: string;
+        height?: string;
         lastBlockHash?: string;
         offset?: number;
         limit?: number;
@@ -40,6 +45,7 @@ export declare class BywiseApiV2 {
     getTransactionsFromSlice(node: BywiseNode, sliceHash: string): Promise<BywiseResponse<PublishedTx[]>>;
     publishNewTransaction(node: BywiseNode, tx: Tx): Promise<BywiseResponse<void>>;
     getTxs(node: BywiseNode, parameters: {
+        chain?: string;
         from?: string[];
         to?: string[];
         foreignKeys?: string[];
@@ -52,6 +58,7 @@ export declare class BywiseApiV2 {
         asc?: boolean;
     }): Promise<BywiseResponse<PublishedTx[]>>;
     countTxs(node: BywiseNode, parameters: {
+        chain?: string;
         from?: string[];
         to?: string[];
         foreignKeys?: string[];
@@ -63,7 +70,7 @@ export declare class BywiseApiV2 {
     getTransactionByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedTx>>;
     getTxBlockchainInfo(node: BywiseNode, hash: string): Promise<BywiseResponse<TxBlockchainInfo>>;
     getFeeTransaction(node: BywiseNode, simulateTx: SimulateTx): Promise<BywiseResponse<TxOutput>>;
-    getWalletInfo(node: BywiseNode, address: string): Promise<BywiseResponse<WalletInfo>>;
+    getWalletInfo(node: BywiseNode, address: string, chain: string): Promise<BywiseResponse<WalletInfo>>;
     countWallets(node: BywiseNode): Promise<BywiseResponse<CountType>>;
     tryToken(node: BywiseNode): Promise<BywiseResponse<InfoNode>>;
     getInfo(host: string): Promise<BywiseResponse<InfoNode>>;

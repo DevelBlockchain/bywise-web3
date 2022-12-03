@@ -9,9 +9,14 @@ export class BywiseHelper {
     static makeHashV1(hexBytes: string) {
         return base16Encode(sha256(base16Decode(hexBytes))).toLowerCase();
     }
-    
+
     static makeHash(hexBytes: string) {
         return base16Encode(sha256(sha256(base16Decode(hexBytes)))).toLowerCase();
+    }
+
+    static getBWSAddressContract = () => {
+        const addr = ethers.Wallet.createRandom().address;
+        return BywiseHelper.encodeBWSAddress(true, addr);
     }
 
     static encodeBWSAddress = (isContract: boolean, ethAddress: string, tag?: string) => {
@@ -46,7 +51,7 @@ export class BywiseHelper {
         let checkSum = address.substring(address.length - 3);
         let checkSumCalculed = BywiseHelper.makeHash(address.substring(0, address.length - 3)).substring(0, 3);
         if (checkSum !== checkSumCalculed) throw new Error('corrupted address');
-        if(!ethereum_address.isAddress(ethAddress)) throw new Error('invalid address parameters');
+        if (!ethereum_address.isAddress(ethAddress)) throw new Error('invalid address parameters');
         return new InfoAddress({
             version: '1',
             isContract,

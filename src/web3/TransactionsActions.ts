@@ -2,16 +2,101 @@ import { PublishedTx, SimulateTx, Tx, TxBlockchainInfo, TxType } from "../types"
 import { BywiseHelper, Wallet } from "../utils";
 import { Web3 } from "./Web3";
 
-export class TransactionsActions {
+type BlockchainConfig = {
+    name: string;
+    input: string[];
+}
+
+class ConfigTransactions {
     private readonly web3: Web3;
 
     constructor(web3: Web3) {
         this.web3 = web3;
     }
 
-    buildSimpleTx = async (wallet: Wallet, to: string, amount: string, type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
+    private async toTransaction(wallet: Wallet, chain: string, cfg: BlockchainConfig) {
+        const tx = await this.web3.transactions.buildSimpleTx(
+            wallet,
+            chain,
+            wallet.address,
+            '0',
+            TxType.TX_COMMAND,
+            cfg
+        );
+        tx.isValid();
+        return tx;
+    }
+
+    setConfig(wallet: Wallet, chain: string, name: string, value: string): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'setConfig',
+            input: [name, value]
+        })
+    }
+
+    addAdmin(wallet: Wallet, chain: string, address: string): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'addAdmin',
+            input: [address]
+        })
+    }
+
+    removeAdmin(wallet: Wallet, chain: string, address: string): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'removeAdmin',
+            input: [address]
+        })
+    }
+
+    addValidator(wallet: Wallet, chain: string, address: string, type: 'block' | 'slice'): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'addValidator',
+            input: [address, type]
+        })
+    }
+
+    removeValidator(wallet: Wallet, chain: string, address: string, type: 'block' | 'slice'): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'removeValidator',
+            input: [address, type]
+        })
+    }
+
+    setBalance(wallet: Wallet, chain: string, address: string, balance: string): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'setBalance',
+            input: [address, balance]
+        })
+    }
+
+    addBalance(wallet: Wallet, chain: string, address: string, balance: string): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'addBalance',
+            input: [address, balance]
+        })
+    }
+
+    subBalance(wallet: Wallet, chain: string, address: string, balance: string): Promise<Tx> {
+        return this.toTransaction(wallet, chain, {
+            name: 'subBalance',
+            input: [address, balance]
+        })
+    }
+}
+
+export class TransactionsActions {
+    private readonly web3: Web3;
+    public buildConfig;
+
+    constructor(web3: Web3) {
+        this.web3 = web3;
+        this.buildConfig = new ConfigTransactions(web3);
+    }
+
+    buildSimpleTx = async (wallet: Wallet, chain: string, to: string, amount: string, type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
         let tx = new Tx();
-        tx.version = "1";
+        tx.chain = chain;
+        tx.version = "2";
         tx.from = [wallet.address];
         tx.to = [to];
         tx.amount = [amount];
@@ -22,7 +107,7 @@ export class TransactionsActions {
         } else {
             tx.data = {};
         }
-        tx.foreignKeys = foreignKeys;
+        tx.foreignKeys = foreignKeys ? foreignKeys : [];
         tx.created = new Date().toISOString();
         tx.fee = await this.estimateFee(tx);
         tx.hash = tx.toHash();
@@ -30,9 +115,10 @@ export class TransactionsActions {
         return tx;
     }
 
-    buildTx = async (from: string[], to: string[], amount: string[], type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
+    buildTx = async (chain: string, from: string[], to: string[], amount: string[], type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
         let tx = new Tx();
-        tx.version = "1";
+        tx.version = "2";
+        tx.chain = chain;
         tx.from = from;
         tx.to = to;
         tx.amount = amount;
@@ -67,6 +153,7 @@ export class TransactionsActions {
 
     estimateFee = async (tx: Tx): Promise<string> => {
         let simulateTx: SimulateTx = {
+            chain: tx.chain,
             from: tx.from,
             to: tx.to,
             tag: tx.tag,
@@ -76,10 +163,10 @@ export class TransactionsActions {
             foreignKeys: tx.foreignKeys,
         };
         let simulate = await this.web3.network.api.getFeeTransaction(this.web3.network.getRandomNode(), simulateTx);
-        if (simulate.error) {
-            throw new Error(`Can't simulate transaction - details: ${simulate.error}`)
+        if (simulate.data.error) {
+            throw new Error(`Can't simulate transaction - details: ${simulate.data.error}`)
         };
-        return simulate.data.fee;
+        return simulate.data.feeUsed;
     }
 
     sendTransaction = async (tx: Tx): Promise<boolean> => {
@@ -122,5 +209,18 @@ export class TransactionsActions {
                 return req.data.count;
             }
         });
+    }
+
+    waitConfirmation = async(txHash: string, timeout: number): Promise<PublishedTx | undefined> => {
+        let uptime = Date.now();
+        let response: PublishedTx | undefined;
+        while(Date.now()<uptime+timeout) {
+            response = await this.getTransactionByHash(txHash);
+            await BywiseHelper.sleep(500);
+            if(response && response.status !== 'mempool') {
+                return response;
+            }
+        }
+        return response;
     }
 }

@@ -1,17 +1,17 @@
-import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse, Network } from "../types";
+import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse } from "../types";
 export declare type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>;
 export declare type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
 export declare type NetworkConfigs = {
     isClient: boolean;
     myHost: string;
-    networks: Network[];
+    initialNodes: string[];
     maxConnectedNodes: number;
     createConnection?: () => Promise<BywiseNode>;
+    getChains?: () => Promise<string[]>;
     debug: boolean;
 };
 export declare class NetworkActions {
-    private readonly networks;
-    private readonly chains;
+    readonly initialNodes: string[];
     readonly api: BywiseApiV2;
     readonly apiv1: BywiseApiV1;
     readonly isClient: boolean;
@@ -21,6 +21,7 @@ export declare class NetworkActions {
     connectedNodes: BywiseNode[];
     constructor(configs: NetworkConfigs);
     private createConnection;
+    private getChains;
     exportConnections: () => {
         isConnected: boolean;
         connectedNodes: BywiseNode[];

@@ -1,5 +1,5 @@
 export type Network = {
     nodes: string[];
     chain: string;
-    explorer: string;
+    explorer?: string;
 }

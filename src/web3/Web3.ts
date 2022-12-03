@@ -18,8 +18,8 @@ const defaultNetwork: { mainnet: Network, testnet: Network } = {
     testnet: {
         chain: 'testnet',
         nodes: [
-            'https://n0.bywise.org',
-            'https://n1.bywise.org',
+            'https://testnet-node0.bywise.org',
+            'https://testnet-node1.bywise.org',
         ],
         explorer: 'https://testnet.bywise.org'
     },
@@ -38,12 +38,12 @@ export class Web3 {
         return await api.tryToken(node);
     }
 
-    constructor(configs?: { networks?: Network[], maxConnectedNodes?: number, myHost?: string, createConnection?: () => Promise<BywiseNode>, debug?: boolean }) {
+    constructor(configs?: { initialNodes?: string[], maxConnectedNodes?: number, myHost?: string, createConnection?: () => Promise<BywiseNode>, getChains?: () => Promise<string[]>, debug?: boolean }) {
         if (configs) {
             this.debug = configs.debug ? configs.debug : false;
         }
         let networkConfigs: NetworkConfigs = {
-            networks: [defaultNetwork.mainnet, defaultNetwork.testnet],
+            initialNodes: defaultNetwork.mainnet.nodes,
             isClient: false,
             maxConnectedNodes: 10,
             myHost: '',
@@ -54,16 +54,17 @@ export class Web3 {
             if (configs.maxConnectedNodes) {
                 networkConfigs.maxConnectedNodes = configs.maxConnectedNodes;
             }
-            if (configs.createConnection) {
+            if (configs.createConnection || configs.getChains) {
                 networkConfigs.createConnection = configs.createConnection;
+                networkConfigs.getChains = configs.getChains;
                 networkConfigs.isClient = false;
             }
             if (configs.myHost) {
                 networkConfigs.myHost = configs.myHost;
                 networkConfigs.isClient = false;
             }
-            if (configs.networks) {
-                networkConfigs.networks = configs.networks;
+            if (configs.initialNodes) {
+                networkConfigs.initialNodes = configs.initialNodes;
             }
         }
         this.network = new NetworkActions(networkConfigs);

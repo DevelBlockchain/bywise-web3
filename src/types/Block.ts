@@ -100,4 +100,5 @@ export type PublishedBlock = {
     hash: string;
     sign: string;
     externalTxID: string[];
+    status: string;
 }

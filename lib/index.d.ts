@@ -9,3 +9,4 @@ export * from './types/BywiseResponse';
 export * from './types/BywiseApiV1';
 export * from './types/BywiseApiV2';
 export * from './types/BywiseNode';
+export * from './types/BywisePack';

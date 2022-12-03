@@ -147,6 +147,7 @@ export class Tx implements BywiseTransaction {
 }
 
 export type SimulateTx = {
+    chain: string;
     from: string[] | string;
     to: string[] | string;
     amount: string[] | string;

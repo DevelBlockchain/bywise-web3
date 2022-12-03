@@ -25,4 +25,5 @@ export declare type PublishedSlice = {
     lastBlockHash: string;
     hash: string;
     sign: string;
+    status: string;
 };

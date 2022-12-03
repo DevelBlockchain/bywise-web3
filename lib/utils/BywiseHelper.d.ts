@@ -3,6 +3,7 @@ export declare class BywiseHelper {
     static readonly ZERO_ADDRESS = "BWS000000000000000000000000000000000000000000000";
     static makeHashV1(hexBytes: string): string;
     static makeHash(hexBytes: string): string;
+    static getBWSAddressContract: () => string;
     static encodeBWSAddress: (isContract: boolean, ethAddress: string, tag?: string | undefined) => string;
     static decodeBWSAddress: (address: string) => InfoAddress;
     static getAddressTag: (address: string) => string;

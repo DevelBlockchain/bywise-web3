@@ -5,6 +5,6 @@ export declare class WalletsActions {
     constructor(web3: Web3);
     createWallet(): Wallet;
     importWallet(seed: string): Wallet;
-    getWalletInfo: (address: string) => Promise<WalletInfo | undefined>;
+    getWalletInfo: (address: string, chain: string) => Promise<WalletInfo | undefined>;
     countWallets: () => Promise<number | undefined>;
 }

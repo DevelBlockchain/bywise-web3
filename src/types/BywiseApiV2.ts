@@ -1,4 +1,4 @@
-import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse } from '.';
+import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse, BlockPack } from '.';
 import { WalletInfo } from '../utils';
 import { Block, PublishedBlock } from './Block';
 import { ConfigNode, CountType } from './BywiseNode';
@@ -17,6 +17,9 @@ export class BywiseApiV2 {
         let params = ''
         if (parameters) {
             params = '?' + (Object.entries(parameters).map(([key, value]) => {
+                if (typeof value === 'object') {
+                    return `${key}=${encodeURI(JSON.stringify(value))}`;
+                }
                 return `${key}=${encodeURI(`${value}`)}`;
             })).join('&');
         }
@@ -85,26 +88,33 @@ export class BywiseApiV2 {
         return this.post(`${node.host}/api/v2/blocks`, node.token, block);
     }
 
-    getBlocks(node: BywiseNode, parameters: { height?: number, from?: string, lastHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedBlock[]>> {
+    getBlocks(node: BywiseNode, parameters: { height?: any, status?: string, from?: string, lastHash?: string, offset?: number, limit?: number, asc?: boolean, chain?: string }): Promise<BywiseResponse<PublishedBlock[]>> {
         let query: any = {};
-        if (parameters.height !== undefined) query.height = parameters.height
-        if (parameters.from !== undefined) query.from = parameters.from
-        if (parameters.lastHash !== undefined) query.lastHash = parameters.lastHash
         if (parameters.offset !== undefined) query.offset = parameters.offset
         if (parameters.limit !== undefined) query.limit = parameters.limit
         if (parameters.asc !== undefined) query.asc = parameters.asc
-        return this.get(`${node.host}/api/v2/blocks`, node.token, query);
+        if (parameters.status !== undefined) query.status = parameters.status
+        if (parameters.from !== undefined) query['block.from'] = parameters.from
+        if (parameters.lastHash !== undefined) query['block.lastHash'] = parameters.lastHash
+        if (parameters.from !== undefined) query['block.from'] = parameters.from
+        if (parameters.height !== undefined) query['block.height'] = parameters.height
+        if (parameters.chain !== undefined) query['block.chain'] = parameters.chain
+        return this.get(`${node.host}/api/v2/blocks`, node.token, { where: query });
     }
 
     countBlocks(node: BywiseNode, parameters: { height?: number, from?: string }): Promise<BywiseResponse<CountType>> {
         let query: any = {};
-        if (parameters.height !== undefined) query.height = parameters.height
-        if (parameters.from !== undefined) query.from = parameters.from
-        return this.get(`${node.host}/api/v2/blocks/count`, node.token, query);
+        if (parameters.from !== undefined) query['block.from'] = parameters.from
+        if (parameters.height !== undefined) query['block.height'] = parameters.height
+        return this.get(`${node.host}/api/v2/blocks/count`, node.token, { where: query });
     }
 
     getBlockByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedBlock>> {
         return this.get(`${node.host}/api/v2/blocks/${hash}`, node.token);
+    }
+
+    getBlockPackByHeight(node: BywiseNode, chain: string, height: number): Promise<BywiseResponse<BlockPack>> {
+        return this.get(`${node.host}/api/v2/blocks-pack/${chain}/${height}`, node.token);
     }
 
     getSlicesFromBlock(node: BywiseNode, blockHash: string): Promise<BywiseResponse<PublishedSlice[]>> {
@@ -115,21 +125,23 @@ export class BywiseApiV2 {
         return this.post(`${node.host}/api/v2/slices`, node.token, slice);
     }
 
-    getSlices(node: BywiseNode, parameters: { from?: string, lastBlockHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedSlice[]>> {
+    getSlices(node: BywiseNode, parameters: { from?: string, chain?: string, height?: string, lastBlockHash?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedSlice[]>> {
         let query: any = {};
-        if (parameters.from !== undefined) query.from = parameters.from
-        if (parameters.lastBlockHash !== undefined) query.lastBlockHash = parameters.lastBlockHash
         if (parameters.offset !== undefined) query.offset = parameters.offset
         if (parameters.limit !== undefined) query.limit = parameters.limit
         if (parameters.asc !== undefined) query.asc = parameters.asc
-        return this.get(`${node.host}/api/v2/slices`, node.token, query);
+        if (parameters.from !== undefined) query['slice.from'] = parameters.from
+        if (parameters.lastBlockHash !== undefined) query['slice.lastBlockHash'] = parameters.lastBlockHash
+        if (parameters.chain !== undefined) query['slice.chain'] = parameters.chain
+        if (parameters.height !== undefined) query['slice.height'] = parameters.height
+        return this.get(`${node.host}/api/v2/slices`, node.token, { where: query });
     }
 
     countSlices(node: BywiseNode, parameters: { from?: string, lastBlockHash?: string }): Promise<BywiseResponse<CountType>> {
         let query: any = {};
-        if (parameters.from !== undefined) query.from = parameters.from
-        if (parameters.lastBlockHash !== undefined) query.lastBlockHash = parameters.lastBlockHash
-        return this.get(`${node.host}/api/v2/slices/count`, node.token, query);
+        if (parameters.from !== undefined) query['slice.from'] = parameters.from
+        if (parameters.lastBlockHash !== undefined) query['slice.lastBlockHash'] = parameters.lastBlockHash
+        return this.get(`${node.host}/api/v2/slices/count`, node.token, { where: query });
     }
 
     getSliceByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedSlice>> {
@@ -144,31 +156,32 @@ export class BywiseApiV2 {
         return this.post(`${node.host}/api/v2/transactions`, node.token, tx);
     }
 
-    getTxs(node: BywiseNode, parameters: { from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedTx[]>> {
+    getTxs(node: BywiseNode, parameters: { chain?: string, from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedTx[]>> {
         let query: any = {};
-        if (parameters.from !== undefined) query.from = parameters.from.join(',');
-        if (parameters.to !== undefined) query.to = parameters.to.join(',');
-        if (parameters.foreignKeys !== undefined) query.foreignKeys = parameters.foreignKeys.join(',');
-        if (parameters.tag !== undefined) query.tag = parameters.tag;
-        if (parameters.type !== undefined) query.type = parameters.type;
+        if (parameters.chain !== undefined) query['tx.chain'] = parameters.chain
+        if (parameters.from !== undefined) query['tx.from'] = { $in: parameters.from }
+        if (parameters.to !== undefined) query['tx.to'] = { $in: parameters.to }
+        if (parameters.foreignKeys !== undefined) query['tx.foreignKeys'] = { $in: parameters.foreignKeys }
+        if (parameters.tag !== undefined) query['tx.tag'] = parameters.tag
+        if (parameters.type !== undefined) query['tx.type'] = parameters.type
+
         if (parameters.status !== undefined) query.status = parameters.status;
-        if (parameters.validator !== undefined) query.validator = parameters.validator;
         if (parameters.offset !== undefined) query.offset = parameters.offset;
         if (parameters.limit !== undefined) query.limit = parameters.limit;
         if (parameters.asc !== undefined) query.asc = parameters.asc;
-        return this.get(`${node.host}/api/v2/transactions`, node.token, query);
+        return this.get(`${node.host}/api/v2/transactions`, node.token, { where: query });
     }
 
-    countTxs(node: BywiseNode, parameters: { from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string }): Promise<BywiseResponse<CountType>> {
+    countTxs(node: BywiseNode, parameters: { chain?: string, from?: string[], to?: string[], foreignKeys?: string[], tag?: string, type?: string, status?: string, validator?: string }): Promise<BywiseResponse<CountType>> {
         let query: any = {};
-        if (parameters.from !== undefined) query.from = parameters.from.join(',');
-        if (parameters.to !== undefined) query.to = parameters.to.join(',');
-        if (parameters.foreignKeys !== undefined) query.foreignKeys = parameters.foreignKeys.join(',');
-        if (parameters.tag !== undefined) query.tag = parameters.tag;
-        if (parameters.type !== undefined) query.type = parameters.type;
+        if (parameters.chain !== undefined) query['tx.chain'] = parameters.chain
+        if (parameters.from !== undefined) query['tx.from'] = { $in: parameters.from }
+        if (parameters.to !== undefined) query['tx.to'] = { $in: parameters.to }
+        if (parameters.foreignKeys !== undefined) query['tx.foreignKeys'] = { $in: parameters.foreignKeys }
+        if (parameters.tag !== undefined) query['tx.tag'] = parameters.tag
+        if (parameters.type !== undefined) query['tx.type'] = parameters.type
         if (parameters.status !== undefined) query.status = parameters.status;
-        if (parameters.validator !== undefined) query.validator = parameters.validator;
-        return this.get(`${node.host}/api/v2/transactions/count`, node.token, query);
+        return this.get(`${node.host}/api/v2/transactions/count`, node.token, { where: query });
     }
 
     getTransactionByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedTx>> {
@@ -183,8 +196,8 @@ export class BywiseApiV2 {
         return this.post(`${node.host}/api/v2/transactions/fee`, node.token, simulateTx);
     }
 
-    getWalletInfo(node: BywiseNode, address: string): Promise<BywiseResponse<WalletInfo>> {
-        return this.get(`${node.host}/api/v2/wallets/${address}`, node.token);
+    getWalletInfo(node: BywiseNode, address: string, chain: string): Promise<BywiseResponse<WalletInfo>> {
+        return this.get(`${node.host}/api/v2/wallets/${address}/${chain}`, node.token);
     }
 
     countWallets(node: BywiseNode): Promise<BywiseResponse<CountType>> {

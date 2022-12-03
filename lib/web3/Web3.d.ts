@@ -1,4 +1,4 @@
-import { Network, BywiseNode } from "../types";
+import { BywiseNode } from "../types";
 import { WalletsActions } from "./WalletsActions";
 import { BlocksActions } from "./BlocksActions";
 import { NetworkActions } from "./NetworkActions";
@@ -13,10 +13,11 @@ export declare class Web3 {
     private readonly debug;
     static tryToken(node: BywiseNode): Promise<import("../types").BywiseResponse<import("../types").InfoNode>>;
     constructor(configs?: {
-        networks?: Network[];
+        initialNodes?: string[];
         maxConnectedNodes?: number;
         myHost?: string;
         createConnection?: () => Promise<BywiseNode>;
+        getChains?: () => Promise<string[]>;
         debug?: boolean;
     });
 }
