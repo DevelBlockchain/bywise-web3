@@ -57,7 +57,6 @@ export class NetworkActions {
     importConnections = async (payload: any) => {
         this.isConnected = payload.isConnected;
         this.connectedNodes = payload.connectedNodes;
-        await this.tryConnection();
     }
 
     private async populateKnowHosts(knowHosts: string[]) {
