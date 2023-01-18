@@ -1,27 +1,31 @@
-import { BywisePack } from "./BywisePack";
 import { BywiseTransaction } from "./BywiseTransaction";
-export declare class Slice implements BywiseTransaction, BywisePack {
+export declare class Slice implements BywiseTransaction {
     height: number;
+    blockHeight: number;
     transactions: string[];
+    transactionsCount: number;
     version: string;
     chain: string;
     from: string;
-    created: string;
+    created: number;
+    end: boolean;
     lastBlockHash: string;
     hash: string;
     sign: string;
     constructor(slice?: Partial<Slice>);
-    validatorHash(): string;
-    getMerkleRoot(): string;
+    private getMerkleRoot;
     toHash(): string;
     isValid(): void;
 }
 export declare type PublishedSlice = {
     height: number;
+    blockHeight: number;
     transactions: string[];
+    transactionsCount: number;
     version: string;
     from: string;
-    created: string;
+    created: number;
+    end: boolean;
     lastBlockHash: string;
     hash: string;
     sign: string;

@@ -6,6 +6,7 @@ import { Slice } from "./Slice";
 export enum TxType {
     TX_NONE = 'none',
     TX_JSON = 'json',
+    TX_BLOCKCHAIN_COMMAND = 'blockchain-command',
     TX_COMMAND = 'command',
     TX_COMMAND_INFO = "command-info",
     TX_CONTRACT = 'contract',
@@ -27,12 +28,11 @@ export class Tx implements BywiseTransaction {
     from: string[];
     to: string[];
     amount: string[];
-    tag: string;
     fee: string;
-    type: TxType;
+    type: string;
     foreignKeys?: string[];
     data: any;
-    created: string;
+    created: number;
     hash: string;
     validatorSign?: string;
     sign: string[];
@@ -44,12 +44,11 @@ export class Tx implements BywiseTransaction {
         this.from = tx?.from ?? [];
         this.to = tx?.to ?? [];
         this.amount = tx?.amount ?? [];
-        this.tag = tx?.tag ?? '';
         this.fee = tx?.fee ?? '';
         this.type = tx?.type ?? TxType.TX_NONE;
         this.foreignKeys = tx?.foreignKeys;
         this.data = tx?.data ?? {};
-        this.created = tx?.created ?? '';
+        this.created = tx?.created ?? 0;
         this.hash = tx?.hash ?? '';
         this.validatorSign = tx?.validatorSign;
         this.sign = tx?.sign ?? [];
@@ -73,7 +72,6 @@ export class Tx implements BywiseTransaction {
         this.amount.forEach(amount => {
             bytes += Buffer.from(amount, 'utf-8').toString('hex');
         })
-        bytes += Buffer.from(this.tag, 'utf-8').toString('hex');
         bytes += Buffer.from(this.fee, 'utf-8').toString('hex');
         bytes += Buffer.from(this.type, 'utf-8').toString('hex');
         bytes += Buffer.from(BywiseHelper.jsonToString(this.data), 'utf-8').toString('hex');
@@ -82,7 +80,7 @@ export class Tx implements BywiseTransaction {
                 bytes += Buffer.from(key, 'utf-8').toString('hex');;
             })
         }
-        bytes += Buffer.from(this.created, 'utf-8').toString('hex');
+        bytes += BywiseHelper.numberToHex(this.created);
         if (this.version == '1') {
             bytes = BywiseHelper.makeHashV1(bytes);
         } else {
@@ -103,23 +101,18 @@ export class Tx implements BywiseTransaction {
         this.from.forEach(from => {
             if (!BywiseHelper.isValidAddress(from)) throw new Error('invalid transaction sender address ' + from);
         })
-        let tag = '';
         if (this.to.length === 0) throw new Error('invalid transaction recipient cant be empty');
         if (this.to.length > 100) throw new Error('maximum number of recipient is 100');
         this.to.forEach((to, i) => {
             if (!BywiseHelper.isValidAddress(to)) throw new Error('invalid transaction recipient address ' + to);
-            if (i === 0) {
-                tag = BywiseHelper.getAddressTag(to);
-            }
         })
-        if (this.tag !== tag) throw new Error('invalid tag ' + this.tag);
         if (this.amount.length === 0) throw new Error('invalid transaction amount cant be empty');
         if (this.amount.length !== this.to.length) throw new Error('to field must be the same length as amount');
         this.amount.forEach(amount => {
             if (!BywiseHelper.isValidAmount(amount)) throw new Error('invalid transaction amount ' + amount);
         })
         if (!BywiseHelper.isValidAmount(this.fee)) throw new Error('invalid transaction fee ' + this.fee);
-        if (!Object.values(TxType).includes(this.type)) throw new Error('invalid type ' + this.type);
+        if (!Object.values(TxType).map(t => t.toString()).includes(this.type)) throw new Error('invalid type ' + this.type);
         if (this.foreignKeys) {
             if (this.to.length > 100) throw new Error('maximum number of foreignKeys is 100');
             this.foreignKeys.forEach(key => {
@@ -151,10 +144,26 @@ export type SimulateTx = {
     from: string[] | string;
     to: string[] | string;
     amount: string[] | string;
-    tag: string;
     foreignKeys?: string[];
-    type: TxType;
+    type: string;
     data: any;
+}
+
+export type SimulateContract = {
+    code?: string;
+    method?: string;
+    inputs?: string[];
+    from: string;
+    contractAddress?: string;
+    amount: number;
+    env: any;
+}
+
+export type OutputSimulateContract = {
+    error?: string;
+    stack?: string;
+    output: any;
+    env: any;
 }
 
 export type TxOutput = {
@@ -173,12 +182,11 @@ export type PublishedTx = {
     from: string[];
     to: string[];
     amount: string[];
-    tag: string;
     fee: string;
-    type: TxType;
+    type: string;
     foreignKeys?: string[];
     data: any;
-    created: string;
+    created: number;
     hash: string;
     validatorSign?: string;
     sign: string[];

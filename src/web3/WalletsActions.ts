@@ -24,13 +24,4 @@ export class WalletsActions {
             }
         });
     }
-
-    countWallets = async (): Promise<number | undefined> => {
-        return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.countWallets(node);
-            if (!req.error) {
-                return req.data.count;
-            }
-        });
-    }
 }

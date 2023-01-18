@@ -1,14 +1,14 @@
 import { BywiseHelper } from "../utils/BywiseHelper";
-import { BywisePack } from "./BywisePack";
 import { BywiseTransaction } from "./BywiseTransaction";
 
-export class Block implements BywiseTransaction, BywisePack {
+export class Block implements BywiseTransaction {
     height: number;
     slices: string[];
+    transactionsCount: number;
     version: string;
     chain: string;
     from: string;
-    created: string;
+    created: number;
     lastHash: string;
     hash: string;
     sign: string;
@@ -17,25 +17,18 @@ export class Block implements BywiseTransaction, BywisePack {
     constructor(block?: Partial<Block>) {
         this.height = block?.height ?? 0;
         this.slices = block?.slices ?? [];
+        this.transactionsCount = block?.transactionsCount ?? 0;
         this.version = block?.version ?? '';
         this.chain = block?.chain ?? '';
         this.from = block?.from ?? '';
-        this.created = block?.created ?? '';
+        this.created = block?.created ?? 0;
         this.lastHash = block?.lastHash ?? '';
         this.hash = block?.hash ?? '';
         this.sign = block?.sign ?? '';
         this.externalTxID = block?.externalTxID ?? [];
     }
 
-    validatorHash() {
-        let bytes = '';
-        bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
-        bytes += BywiseHelper.numberToHex(this.height);
-        bytes = BywiseHelper.makeHash(bytes);
-        return bytes;
-    }
-
-    getMerkleRoot() {
+    private getMerkleRoot() {
         let merkleRoot = '';
         if (this.slices.length > 0) {
             this.slices.forEach(sliceHash => {
@@ -51,28 +44,24 @@ export class Block implements BywiseTransaction, BywisePack {
     toHash(): string {
         let bytes = '';
         bytes += BywiseHelper.numberToHex(this.height);
+        bytes += BywiseHelper.numberToHex(this.transactionsCount);
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
         if(this.version == '2') {
             bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
         }
         bytes += Buffer.from(this.from, 'utf-8').toString('hex');
-        if(this.version == '1') {
-            bytes += Buffer.from(this.from, 'utf-8').toString('hex'); // nextSlice
-            bytes += Buffer.from(this.from, 'utf-8').toString('hex'); // nextBlock
-        }
-        bytes += Buffer.from(this.created, 'utf-8').toString('hex');
+        bytes += BywiseHelper.numberToHex(this.created);
         bytes += this.getMerkleRoot();
         bytes += this.lastHash;
-        if (this.version == '1') {
-            bytes = BywiseHelper.makeHashV1(bytes);
-        } else {
-            bytes = BywiseHelper.makeHash(bytes);
-        }
+        bytes = BywiseHelper.makeHash(bytes);
         return bytes;
     }
 
     isValid(): void {
+        if (typeof this.height === 'number') throw new Error('invalid block height ' + this.height);
         if (this.height < 0) throw new Error('invalid block height ' + this.height);
+        if (typeof this.transactionsCount === 'number') throw new Error('invalid block transactionsCount ' + this.transactionsCount);
+        if (this.transactionsCount >= 0) throw new Error('invalid block transactionsCount ' + this.transactionsCount);
         for (let i = 0; i < this.slices.length; i++) {
             let sliceHash = this.slices[i];
             if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid slice hash ${i} - ${sliceHash}`);
@@ -93,9 +82,10 @@ export class Block implements BywiseTransaction, BywisePack {
 export type PublishedBlock = {
     height: number;
     slices: string[];
+    transactionsCount: number;
     version: string;
     from: string;
-    created: string;
+    created: number;
     lastHash: string;
     hash: string;
     sign: string;

@@ -14,25 +14,6 @@ export class SlicesActions {
         });
     }
 
-    findLastSlices = async (limit: number = 100): Promise<PublishedSlice[]> => {
-        let lastSlices: PublishedSlice[] = [];
-        let lastSlice = 0;
-        await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.getSlices(node, { limit });
-            if (!req.error) {
-                let slices = req.data;
-                slices.forEach(slice => {
-                    let createdSlice = new Date(slice.created).getTime();
-                    if (createdSlice > lastSlice) {
-                        lastSlice = createdSlice;
-                        lastSlices = slices;
-                    }
-                })
-            }
-        });
-        return lastSlices;
-    }
-
     getSliceByHash = async (sliceHash: string): Promise<PublishedSlice | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getSliceByHash(node, sliceHash);
@@ -42,18 +23,18 @@ export class SlicesActions {
         });
     }
 
-    getSlices = async (parameters: { from?: string, lastBlockHash?: string, offset?: number, limit?: number, asc?: boolean } = {}): Promise<PublishedSlice[] | undefined> => {
+    getSlices = async (chain: string, parameters: { status?: string, offset?: number, limit?: number, asc?: boolean } = {}): Promise<PublishedSlice[] | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.getSlices(node, parameters);
+            let req = await this.web3.network.api.getSlices(node, chain, parameters);
             if (!req.error) {
                 return req.data;
             }
         });
     }
 
-    countSlices = async (parameters: { from?: string, lastBlockHash?: string } = {}): Promise<number | undefined> => {
+    countSlices = async (chain: string): Promise<number | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.countSlices(node, parameters);
+            let req = await this.web3.network.api.countSlices(node, chain);
             if (!req.error) {
                 return req.data.count;
             }

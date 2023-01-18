@@ -4,6 +4,7 @@ import { Slice } from "./Slice";
 export declare enum TxType {
     TX_NONE = "none",
     TX_JSON = "json",
+    TX_BLOCKCHAIN_COMMAND = "blockchain-command",
     TX_COMMAND = "command",
     TX_COMMAND_INFO = "command-info",
     TX_CONTRACT = "contract",
@@ -24,12 +25,11 @@ export declare class Tx implements BywiseTransaction {
     from: string[];
     to: string[];
     amount: string[];
-    tag: string;
     fee: string;
-    type: TxType;
+    type: string;
     foreignKeys?: string[];
     data: any;
-    created: string;
+    created: number;
     hash: string;
     validatorSign?: string;
     sign: string[];
@@ -42,10 +42,24 @@ export declare type SimulateTx = {
     from: string[] | string;
     to: string[] | string;
     amount: string[] | string;
-    tag: string;
     foreignKeys?: string[];
-    type: TxType;
+    type: string;
     data: any;
+};
+export declare type SimulateContract = {
+    code?: string;
+    method?: string;
+    inputs?: string[];
+    from: string;
+    contractAddress?: string;
+    amount: number;
+    env: any;
+};
+export declare type OutputSimulateContract = {
+    error?: string;
+    stack?: string;
+    output: any;
+    env: any;
 };
 export declare type TxOutput = {
     cost?: number;
@@ -62,12 +76,11 @@ export declare type PublishedTx = {
     from: string[];
     to: string[];
     amount: string[];
-    tag: string;
     fee: string;
-    type: TxType;
+    type: string;
     foreignKeys?: string[];
     data: any;
-    created: string;
+    created: number;
     hash: string;
     validatorSign?: string;
     sign: string[];

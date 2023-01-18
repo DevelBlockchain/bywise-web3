@@ -6,5 +6,4 @@ export declare class WalletsActions {
     createWallet(): Wallet;
     importWallet(seed: string): Wallet;
     getWalletInfo: (address: string, chain: string) => Promise<WalletInfo | undefined>;
-    countWallets: () => Promise<number | undefined>;
 }

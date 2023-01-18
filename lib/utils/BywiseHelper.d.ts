@@ -12,7 +12,7 @@ export declare class BywiseHelper {
     static isValidAmount: (amount: string) => boolean;
     static isValidAlfaNum: (value: string) => boolean;
     static isValidHash: (value: string) => boolean;
-    static isValidDate: (date: string) => boolean;
+    static isValidDate: (date: number) => boolean;
     static isValidSign: (sign: string, signAddress: string, hash: string) => boolean;
     static jsonToString: (mainJson: any) => string;
     static numberToHex: (number: number) => string;

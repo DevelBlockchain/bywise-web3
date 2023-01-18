@@ -84,8 +84,8 @@ export class BywiseHelper {
         return /^[a-f0-9]{64}$/.test(value);
     }
 
-    static isValidDate = (date: string) => {
-        return /^[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\.[0-9]{3}Z$/.test(date);
+    static isValidDate = (date: number) => {
+        return /^[0-9]{10}$/.test(`${date}`);
     }
 
     static isValidSign = (sign: string, signAddress: string, hash: string) => {
