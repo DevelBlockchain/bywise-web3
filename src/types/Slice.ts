@@ -67,7 +67,7 @@ export class Slice implements BywiseTransaction {
         if (this.blockHeight < 0) throw new Error('invalid slice blockHeight ' + this.blockHeight);
 
         if (typeof this.transactionsCount !== 'number') throw new Error('invalid slice transactionsCount ' + this.transactionsCount);
-        if (this.transactionsCount >= 0) throw new Error('invalid slice transactionsCount ' + this.transactionsCount);
+        if (this.transactionsCount < 0) throw new Error('invalid slice transactionsCount ' + this.transactionsCount);
 
         if (this.transactions.length == 0) throw new Error('invalid slice length');
         for (let i = 0; i < this.transactions.length; i++) {
