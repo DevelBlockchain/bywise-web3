@@ -85,6 +85,7 @@ export class BywiseHelper {
     }
 
     static isValidDate = (date: number) => {
+        if (typeof date !== 'number') return false;;
         return /^[0-9]{10}$/.test(`${date}`);
     }
 

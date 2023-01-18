@@ -58,9 +58,9 @@ export class Block implements BywiseTransaction {
     }
 
     isValid(): void {
-        if (typeof this.height === 'number') throw new Error('invalid block height ' + this.height);
+        if (typeof this.height !== 'number') throw new Error('invalid block height ' + this.height);
         if (this.height < 0) throw new Error('invalid block height ' + this.height);
-        if (typeof this.transactionsCount === 'number') throw new Error('invalid block transactionsCount ' + this.transactionsCount);
+        if (typeof this.transactionsCount !== 'number') throw new Error('invalid block transactionsCount ' + this.transactionsCount);
         if (this.transactionsCount >= 0) throw new Error('invalid block transactionsCount ' + this.transactionsCount);
         for (let i = 0; i < this.slices.length; i++) {
             let sliceHash = this.slices[i];
