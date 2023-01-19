@@ -9,7 +9,6 @@ export declare class Slice implements BywiseTransaction {
     from: string;
     created: number;
     end: boolean;
-    lastBlockHash: string;
     hash: string;
     sign: string;
     constructor(slice?: Partial<Slice>);
@@ -26,7 +25,6 @@ export declare type PublishedSlice = {
     from: string;
     created: number;
     end: boolean;
-    lastBlockHash: string;
     hash: string;
     sign: string;
     status: string;

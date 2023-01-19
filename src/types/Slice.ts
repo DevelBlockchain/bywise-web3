@@ -11,7 +11,6 @@ export class Slice implements BywiseTransaction {
     from: string;
     created: number;
     end: boolean;
-    lastBlockHash: string;
     hash: string;
     sign: string;
 
@@ -25,7 +24,6 @@ export class Slice implements BywiseTransaction {
         this.from = slice?.from ?? '';
         this.created = slice?.created ?? 0;
         this.end = slice?.end ?? false;
-        this.lastBlockHash = slice?.lastBlockHash ?? '';
         this.hash = slice?.hash ?? '';
         this.sign = slice?.sign ?? '';
     }
@@ -54,7 +52,6 @@ export class Slice implements BywiseTransaction {
         bytes += BywiseHelper.numberToHex(this.created);
         bytes += Buffer.from(this.end ? 'true' : 'false', 'utf-8').toString('hex');
         bytes += this.getMerkleRoot();
-        bytes += this.lastBlockHash;
         bytes = BywiseHelper.makeHash(bytes);
         return bytes;
     }
@@ -82,7 +79,6 @@ export class Slice implements BywiseTransaction {
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid slice from address ' + this.from);
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid slice created date ' + this.created);
         if (this.end !== true && this.end !== false) throw new Error('invalid slice end flag ' + this.version);
-        if (!BywiseHelper.isValidHash(this.lastBlockHash)) throw new Error('invalid lastBlockHash ' + this.lastBlockHash);
         if (this.hash !== this.toHash()) throw new Error(`invalid slice hash ${this.hash} ${this.toHash()}`);
         if (!BywiseHelper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid slice signature');
     }
@@ -97,7 +93,6 @@ export type PublishedSlice = {
     from: string;
     created: number;
     end: boolean;
-    lastBlockHash: string;
     hash: string;
     sign: string;
     status: string;
