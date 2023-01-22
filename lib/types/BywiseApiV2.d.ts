@@ -54,7 +54,7 @@ export declare class BywiseApiV2 {
         };
     }): Promise<BywiseResponse<CountType>>;
     getTransactionByHash(node: BywiseNode, hash: string): Promise<BywiseResponse<PublishedTx>>;
-    getContractByAddress(node: BywiseNode, address: string): Promise<BywiseResponse<TxOutput>>;
+    getContractByAddress(node: BywiseNode, chain: string, address: string): Promise<BywiseResponse<TxOutput>>;
     trySimulate(node: BywiseNode, simulateTx: SimulateContract): Promise<BywiseResponse<OutputSimulateContract>>;
     getFeeTransaction(node: BywiseNode, simulateTx: SimulateTx): Promise<BywiseResponse<TxOutput>>;
     getWalletInfo(node: BywiseNode, address: string, chain: string): Promise<BywiseResponse<WalletInfo>>;

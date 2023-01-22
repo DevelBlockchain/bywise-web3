@@ -10,7 +10,6 @@ export type NetworkConfigs = {
     initialNodes: string[],
     maxConnectedNodes: number,
     createConnection?: () => Promise<BywiseNode>
-    getChains?: () => Promise<string[]>
     debug: boolean,
 };
 
@@ -34,17 +33,10 @@ export class NetworkActions {
         if (configs.createConnection) {
             this.createConnection = configs.createConnection
         }
-        if (configs.getChains) {
-            this.getChains = configs.getChains
-        }
     }
 
     private createConnection = async () => {
         return new BywiseNode({});
-    }
-    
-    private getChains = async (): Promise<string[]>=> {
-        return [];
     }
 
     exportConnections = () => {
@@ -65,16 +57,6 @@ export class NetworkActions {
                 knowHosts.push(host);
             }
         })
-    }
-
-    private async includesChain(node: BywiseNode) {
-        for (let i = 0; i < node.chains.length; i++) {
-            const chain = node.chains[i];
-            if ((await this.getChains()).includes(chain)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private async excludeOfflineNodesAndUpdateKnowHosts(knowHosts: string[]) {
@@ -139,7 +121,7 @@ export class NetworkActions {
         this.isConnected = false;
         let knowHosts: string[] = [];
         await this.populateKnowHosts(knowHosts);
-        if(knowHosts.length === 0) {
+        if (knowHosts.length === 0) {
             this.isConnected = true;
         }
         await this.excludeOfflineNodesAndUpdateKnowHosts(knowHosts);
@@ -149,6 +131,20 @@ export class NetworkActions {
             this.isConnected = true;
         }
         return this.connectedNodes.length;
+    }
+
+    async testConnections() {
+        let success = this.initialNodes.length === 0;
+        for (let i = this.connectedNodes.length - 1; i >= 0 && !success; i--) {
+            const node = this.connectedNodes[i];
+            let req = await this.api.tryToken(node);
+            if (req.error) {
+                this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
+            } else {
+                success = true;
+            }
+        }
+        return success;
     }
 
     addNode = (node: BywiseNode) => {

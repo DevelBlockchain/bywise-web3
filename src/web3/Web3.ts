@@ -56,7 +56,6 @@ export class Web3 {
             }
             if (configs.createConnection || configs.getChains) {
                 networkConfigs.createConnection = configs.createConnection;
-                networkConfigs.getChains = configs.getChains;
                 networkConfigs.isClient = false;
             }
             if (configs.myHost) {

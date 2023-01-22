@@ -12,8 +12,10 @@ const chain = 'local';
     });
     const wallet = web3.wallets.importWallet('theme enter range boat shine brain coffee exact reflect ability mask hair');
     console.log('create web3 ');
+    console.log('test connection', await web3.network.testConnections())
     await web3.network.tryConnection();
     console.log('connected web3');
+    console.log('test connection', await web3.network.testConnections())
 
     let tx;
     let confirmedTx;

@@ -7,7 +7,6 @@ export declare type NetworkConfigs = {
     initialNodes: string[];
     maxConnectedNodes: number;
     createConnection?: () => Promise<BywiseNode>;
-    getChains?: () => Promise<string[]>;
     debug: boolean;
 };
 export declare class NetworkActions {
@@ -21,18 +20,17 @@ export declare class NetworkActions {
     connectedNodes: BywiseNode[];
     constructor(configs: NetworkConfigs);
     private createConnection;
-    private getChains;
     exportConnections: () => {
         isConnected: boolean;
         connectedNodes: BywiseNode[];
     };
     importConnections: (payload: any) => Promise<void>;
     private populateKnowHosts;
-    private includesChain;
     private excludeOfflineNodesAndUpdateKnowHosts;
     private removeConnectedNodes;
     private tryConnecteKnowNodes;
     tryConnection: () => Promise<number>;
+    testConnections(): Promise<boolean>;
     addNode: (node: BywiseNode) => void;
     getRandomNode: (chain?: string | undefined) => BywiseNode;
     sendAll(sendAction: SendAction, chain?: string): Promise<boolean>;

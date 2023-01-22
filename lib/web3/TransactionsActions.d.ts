@@ -38,9 +38,10 @@ export declare class TransactionsActions {
     estimateFee: (tx: Tx) => Promise<TxOutput>;
     readContract: (chain: string, contractAddress: string, method: string, inputs: string[]) => Promise<TxOutput>;
     slimulateContract: (sc: SimulateContract) => Promise<OutputSimulateContract>;
+    sendTransactionSync: (tx: Tx) => Promise<TxOutput>;
     sendTransaction: (tx: Tx) => Promise<boolean>;
     getTransactionByHash: (txHash: string) => Promise<PublishedTx | undefined>;
-    getContractByAddress: (address: string) => Promise<TxOutput | undefined>;
+    getContractByAddress: (chain: string, address: string) => Promise<TxOutput | undefined>;
     getTxs: (chain: string, parameters?: {
         status?: string;
         offset?: number;
@@ -59,6 +60,6 @@ export declare class TransactionsActions {
             value: string;
         };
     }) => Promise<number | undefined>;
-    waitConfirmation: (txHash: string, timeout: number) => Promise<PublishedTx | undefined>;
+    waitConfirmation: (txHash: string, timeout?: number) => Promise<PublishedTx | undefined>;
 }
 export {};

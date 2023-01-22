@@ -180,8 +180,8 @@ export class BywiseApiV2 {
         return this.get(`${node.host}/api/v2/transactions/hash/${hash}`, node.token);
     }
 
-    getContractByAddress(node: BywiseNode, address: string): Promise<BywiseResponse<TxOutput>> {
-        return this.get(`${node.host}/api/v2/transactions/contract/${address}`, node.token);
+    getContractByAddress(node: BywiseNode, chain: string, address: string): Promise<BywiseResponse<TxOutput>> {
+        return this.get(`${node.host}/api/v2/transactions/contract/${chain}/${address}`, node.token);
     }
 
     trySimulate(node: BywiseNode, simulateTx: SimulateContract): Promise<BywiseResponse<OutputSimulateContract>> {

@@ -282,6 +282,18 @@ export class TransactionsActions {
         return simulate.data;
     }
 
+    sendTransactionSync = async (tx: Tx): Promise<TxOutput> => {
+        const success = await this.sendTransaction(tx);
+        if (!success) throw new Error(`Failed send transaction`);
+        const minedTx = await this.waitConfirmation(tx.hash, 120000);
+        if (!minedTx) throw new Error(`Timeout`);
+        if (minedTx.status === 'validated' || minedTx.status === 'mined') {
+            return minedTx.output;
+        } else {
+            throw new Error(`Invalidated transaction${minedTx.output ? (' - ' + minedTx.output.error) : ''}`);
+        }
+    }
+
     sendTransaction = async (tx: Tx): Promise<boolean> => {
         return await this.web3.network.sendAll(async (node) => {
             return await this.web3.network.api.publishNewTransaction(node, tx);
@@ -297,9 +309,9 @@ export class TransactionsActions {
         });
     }
 
-    getContractByAddress = async (address: string): Promise<TxOutput | undefined> => {
+    getContractByAddress = async (chain: string, address: string): Promise<TxOutput | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.getContractByAddress(node, address);
+            let req = await this.web3.network.api.getContractByAddress(node, chain, address);
             if (!req.error) {
                 return req.data;
             }
@@ -324,7 +336,7 @@ export class TransactionsActions {
         });
     }
 
-    waitConfirmation = async (txHash: string, timeout: number): Promise<PublishedTx | undefined> => {
+    waitConfirmation = async (txHash: string, timeout: number = 30000): Promise<PublishedTx | undefined> => {
         let uptime = Date.now();
         let response: PublishedTx | undefined;
         while (Date.now() < uptime + timeout) {
