@@ -15,6 +15,7 @@
   ],
   "exclude": [
     "node_modules",
+    "src/dev.ts",
     "**/__tests__/*"
   ]
 }

@@ -152,26 +152,24 @@ export class BywiseApiV2 {
         return this.post(`${node.host}/api/v2/transactions`, node.token, tx);
     }
 
-    getTxs(node: BywiseNode, chain: string, parameters: { status?: string, offset?: number, limit?: number, asc?: boolean, find?: { searchBy: 'address' | 'from' | 'to' | 'key', value: string } }): Promise<BywiseResponse<PublishedTx[]>> {
+    getTxs(node: BywiseNode, chain: string, parameters: { offset?: number, limit?: number, asc?: boolean, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } }): Promise<BywiseResponse<PublishedTx[]>> {
         let query: any = {};
         if(parameters.find) {
             query.searchBy = parameters.find.searchBy
             query.value = parameters.find.value
         }
-        if (parameters.status !== undefined) query.status = parameters.status;
         if (parameters.offset !== undefined) query.offset = parameters.offset;
         if (parameters.limit !== undefined) query.limit = parameters.limit;
         if (parameters.asc !== undefined) query.asc = parameters.asc;
         return this.get(`${node.host}/api/v2/transactions/last/${chain}`, node.token, query);
     }
 
-    countTxs(node: BywiseNode, parameters: { chain?: string, status?: string, find?: { searchBy: 'address' | 'from' | 'to' | 'key', value: string } }): Promise<BywiseResponse<CountType>> {
+    countTxs(node: BywiseNode, parameters: { chain?: string, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } }): Promise<BywiseResponse<CountType>> {
         let query: any = {};
         if(parameters.find) {
             query.searchBy = parameters.find.searchBy
             query.value = parameters.find.value
         }
-        if (parameters.status !== undefined) query.status = parameters.status;
         if (parameters.chain !== undefined) query.chain = parameters.chain;
         return this.get(`${node.host}/api/v2/transactions/count`, node.token, query);
     }

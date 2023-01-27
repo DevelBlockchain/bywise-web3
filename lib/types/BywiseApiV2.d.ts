@@ -36,20 +36,18 @@ export declare class BywiseApiV2 {
     getTransactionsFromSlice(node: BywiseNode, sliceHash: string): Promise<BywiseResponse<PublishedTx[]>>;
     publishNewTransaction(node: BywiseNode, tx: Tx): Promise<BywiseResponse<void>>;
     getTxs(node: BywiseNode, chain: string, parameters: {
-        status?: string;
         offset?: number;
         limit?: number;
         asc?: boolean;
         find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key';
+            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
             value: string;
         };
     }): Promise<BywiseResponse<PublishedTx[]>>;
     countTxs(node: BywiseNode, parameters: {
         chain?: string;
-        status?: string;
         find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key';
+            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
             value: string;
         };
     }): Promise<BywiseResponse<CountType>>;

@@ -287,7 +287,7 @@ export class TransactionsActions {
         if (!success) throw new Error(`Failed send transaction`);
         const minedTx = await this.waitConfirmation(tx.hash, 120000);
         if (!minedTx) throw new Error(`Timeout`);
-        if (minedTx.status === 'validated' || minedTx.status === 'mined') {
+        if (minedTx.status === 'confirmed' || minedTx.status === 'mined') {
             return minedTx.output;
         } else {
             throw new Error(`Invalidated transaction${minedTx.output ? (' - ' + minedTx.output.error) : ''}`);
@@ -318,7 +318,7 @@ export class TransactionsActions {
         });
     }
 
-    getTxs = async (chain: string, parameters: { status?: string, offset?: number, limit?: number, asc?: boolean, find?: { searchBy: 'address' | 'from' | 'to' | 'key', value: string } } = {}): Promise<PublishedTx[] | undefined> => {
+    getTxs = async (chain: string, parameters: { offset?: number, limit?: number, asc?: boolean, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } } = {}): Promise<PublishedTx[] | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.getTxs(node, chain, parameters);
             if (!req.error) {
@@ -327,7 +327,7 @@ export class TransactionsActions {
         });
     }
 
-    countTxs = async (parameters: { chain?: string, status?: string, find?: { searchBy: 'address' | 'from' | 'to' | 'key', value: string } } = {}): Promise<number | undefined> => {
+    countTxs = async (parameters: { chain?: string, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } } = {}): Promise<number | undefined> => {
         return await this.web3.network.findAll(async (node) => {
             let req = await this.web3.network.api.countTxs(node, parameters);
             if (!req.error) {

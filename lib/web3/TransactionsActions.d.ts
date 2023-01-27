@@ -43,20 +43,18 @@ export declare class TransactionsActions {
     getTransactionByHash: (txHash: string) => Promise<PublishedTx | undefined>;
     getContractByAddress: (chain: string, address: string) => Promise<TxOutput | undefined>;
     getTxs: (chain: string, parameters?: {
-        status?: string;
         offset?: number;
         limit?: number;
         asc?: boolean;
         find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key';
+            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
             value: string;
         };
     }) => Promise<PublishedTx[] | undefined>;
     countTxs: (parameters?: {
         chain?: string;
-        status?: string;
         find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key';
+            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
             value: string;
         };
     }) => Promise<number | undefined>;
