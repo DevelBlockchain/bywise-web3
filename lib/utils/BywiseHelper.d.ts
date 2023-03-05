@@ -9,6 +9,7 @@ export declare class BywiseHelper {
     static getAddressTag: (address: string) => string;
     static isZeroAddress: (address: string) => boolean;
     static isValidAddress: (address: string) => boolean;
+    static isContractAddress: (address: string) => boolean;
     static isValidAmount: (amount: string) => boolean;
     static isValidAlfaNum: (value: string) => boolean;
     static isValidHash: (value: string) => boolean;

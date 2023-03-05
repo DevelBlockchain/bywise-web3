@@ -15,7 +15,7 @@ const chain = 'local';
     console.log('connected web3');
     console.log('test connection', await web3.network.testConnections())
 
-    const address = 'BWS1MUdfc8D15C9e07342Ac51C3e0b170fF87E3248Ae7Edcc';
+    const address = 'BWS1MUAE19a03c1cFCE94Ba00aB2fe96E0De197d1e9867006';
 
     const tx = await web3.transactions.buildConfig.addBalance(wallet, chain, address, '100');
     await web3.transactions.sendTransaction(tx);

@@ -71,6 +71,10 @@ export class BywiseHelper {
     static isValidAddress = (address: string) => {
         return /^(BWS1[MT][CU][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
     }
+    
+    static isContractAddress = (address: string) => {
+        return /^(BWS1[MT][C][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
+    }
 
     static isValidAmount = (amount: string) => {
         return /^((0|[1-9][0-9]{0,24})(\.[0-9]{0,24})?)$/.test(amount);

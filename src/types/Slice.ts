@@ -1,11 +1,17 @@
 import { BywiseHelper } from "../utils/BywiseHelper";
 import { BywiseTransaction } from "./BywiseTransaction";
 
+export type SliceData = {
+    hash: string;
+    data: string[];
+}
+
 export class Slice implements BywiseTransaction {
     height: number;
     blockHeight: number;
     transactions: string[];
     transactionsCount: number;
+    transactionsData?: SliceData[];
     version: string;
     chain: string;
     from: string;
@@ -19,6 +25,7 @@ export class Slice implements BywiseTransaction {
         this.blockHeight = slice?.blockHeight ?? 0;
         this.transactions = slice?.transactions ?? [];
         this.transactionsCount = slice?.transactionsCount ?? 0;
+        this.transactionsData = slice?.transactionsData;
         this.version = slice?.version ?? '';
         this.chain = slice?.chain ?? '';
         this.from = slice?.from ?? '';
@@ -40,6 +47,20 @@ export class Slice implements BywiseTransaction {
         }
         return merkleRoot
     }
+    
+    private getMerkleRootData() {
+        let merkleRoot = '';
+        if (this.transactionsData && this.transactionsData.length > 0) {
+            this.transactionsData.forEach(txData => {
+                merkleRoot += txData.hash;
+                txData.data.forEach(data => {
+                    merkleRoot += Buffer.from(data, 'utf-8').toString('hex');
+                })
+            })
+            merkleRoot = BywiseHelper.makeHash(merkleRoot);
+        }
+        return merkleRoot
+    }
 
     toHash(): string {
         let bytes = '';
@@ -52,6 +73,7 @@ export class Slice implements BywiseTransaction {
         bytes += BywiseHelper.numberToHex(this.created);
         bytes += Buffer.from(this.end ? 'true' : 'false', 'utf-8').toString('hex');
         bytes += this.getMerkleRoot();
+        bytes += this.getMerkleRootData();
         bytes = BywiseHelper.makeHash(bytes);
         return bytes;
     }
@@ -59,7 +81,7 @@ export class Slice implements BywiseTransaction {
     isValid(): void {
         if (typeof this.height !== 'number') throw new Error('invalid slice height ' + this.height);
         if (this.height < 0) throw new Error('invalid slice height ' + this.height);
-        
+
         if (typeof this.blockHeight !== 'number') throw new Error('invalid slice blockHeight ' + this.blockHeight);
         if (this.blockHeight < 0) throw new Error('invalid slice blockHeight ' + this.blockHeight);
 
@@ -89,6 +111,7 @@ export type PublishedSlice = {
     blockHeight: number;
     transactions: string[];
     transactionsCount: number;
+    transactionsData: SliceData[];
     version: string;
     from: string;
     created: number;
