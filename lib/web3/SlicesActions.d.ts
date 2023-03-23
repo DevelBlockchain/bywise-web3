@@ -3,7 +3,7 @@ import { Web3 } from "./Web3";
 export declare class SlicesActions {
     private readonly web3;
     constructor(web3: Web3);
-    sendSlice: (slice: Slice) => Promise<boolean>;
+    sendSlice: (slice: Slice) => Promise<string | undefined>;
     getSliceByHash: (sliceHash: string) => Promise<PublishedSlice | undefined>;
     getSlices: (chain: string, parameters?: {
         status?: string;

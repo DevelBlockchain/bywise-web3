@@ -4,9 +4,11 @@ import { BlocksActions } from "./BlocksActions";
 import { NetworkActions } from "./NetworkActions";
 import { SlicesActions } from "./SlicesActions";
 import { TransactionsActions } from "./TransactionsActions";
+import { ContractActions } from "./ContractActions";
 export declare class Web3 {
     readonly wallets: WalletsActions;
     readonly network: NetworkActions;
+    readonly contracts: ContractActions;
     readonly transactions: TransactionsActions;
     readonly blocks: BlocksActions;
     readonly slices: SlicesActions;

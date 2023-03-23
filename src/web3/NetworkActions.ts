@@ -180,8 +180,9 @@ export class NetworkActions {
         return chainNodes[Math.floor(Math.random() * (chainNodes.length - 1))];
     }
 
-    async sendAll(sendAction: SendAction, chain?: string): Promise<boolean> {
+    async sendAll(sendAction: SendAction, chain?: string): Promise<string | undefined> {
         if (!this.isConnected) throw new Error('First connect to blockchain - "web3.network.connect()"');
+        let error: string | undefined = undefined;
         let success = false;
         for (let i = 0; i < this.connectedNodes.length; i++) {
             const node = this.connectedNodes[i];
@@ -189,10 +190,15 @@ export class NetworkActions {
                 let req = await sendAction(node);
                 if (!req.error) {
                     success = true;
+                } else {
+                    error = req.error;
                 }
             }
         }
-        return success;
+        if(success) {
+            return undefined;
+        }
+        return error;
     }
 
     async findAll<T>(filterAction: FilterAction<T>, chain?: string): Promise<T | undefined> {

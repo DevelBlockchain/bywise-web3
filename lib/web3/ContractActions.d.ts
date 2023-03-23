@@ -1,4 +1,4 @@
-import { PublishedTx, Tx, TxOutput, TxType } from "../types";
+import { OutputSimulateContract, SimulateContract, Tx, TxOutput } from "../types";
 import { Wallet } from "../utils";
 import { Web3 } from "./Web3";
 declare class ConfigTransactions {
@@ -29,32 +29,16 @@ declare class ConfigTransactions {
     addBalance(wallet: Wallet, chain: string, address: string, balance: string): Promise<Tx>;
     subBalance(wallet: Wallet, chain: string, address: string, balance: string): Promise<Tx>;
 }
-export declare class TransactionsActions {
+export declare class ContractActions {
     private readonly web3;
     buildConfig: ConfigTransactions;
     constructor(web3: Web3);
-    buildSimpleTx: (wallet: Wallet, chain: string, to: string, amount: string, type?: TxType | undefined, data?: any, foreignKeys?: string[] | undefined) => Promise<Tx>;
-    signTx: (wallets: Wallet[], tx: Tx) => Promise<Tx>;
-    estimateFee: (tx: Tx) => Promise<TxOutput>;
-    sendTransactionSync: (tx: Tx) => Promise<TxOutput>;
-    sendTransaction: (tx: Tx) => Promise<string | undefined>;
-    getTransactionByHash: (txHash: string) => Promise<PublishedTx | undefined>;
-    getTxs: (chain: string, parameters?: {
-        offset?: number;
-        limit?: number;
-        asc?: boolean;
-        find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
-            value: string;
-        };
-    }) => Promise<PublishedTx[] | undefined>;
-    countTxs: (parameters?: {
-        chain?: string;
-        find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
-            value: string;
-        };
-    }) => Promise<number | undefined>;
-    waitConfirmation: (txHash: string, timeout?: number) => Promise<PublishedTx | undefined>;
+    readContract: (chain: string, contractAddress: string, method: string, inputs: string[]) => Promise<TxOutput>;
+    simulateContract: (sc: SimulateContract) => Promise<OutputSimulateContract>;
+    getContractByAddress: (chain: string, address: string) => Promise<TxOutput | undefined>;
+    getContractEventByAddress: (chain: string, address: string, event: string, byKey?: {
+        key: string;
+        value: string;
+    } | undefined) => Promise<TxOutput | undefined>;
 }
 export {};

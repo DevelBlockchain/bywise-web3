@@ -134,9 +134,8 @@ export class Tx implements BywiseTransaction {
         for (let i = 0; i < this.sign.length; i++) {
             const sign = this.sign[i];
             const fromAddress = this.from[i];
-            if(!BywiseHelper.isContractAddress(fromAddress)) {
-                if (!BywiseHelper.isValidSign(sign, fromAddress, this.hash)) throw new Error('invalid signature from address ' + fromAddress);
-            }
+            
+            if (!BywiseHelper.isValidSign(sign, fromAddress, this.hash)) throw new Error('invalid signature from address ' + fromAddress);
         }
     }
 }

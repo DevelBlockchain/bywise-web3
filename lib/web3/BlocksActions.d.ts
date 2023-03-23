@@ -3,7 +3,7 @@ import { Web3 } from "./Web3";
 export declare class BlocksActions {
     private readonly web3;
     constructor(web3: Web3);
-    sendBlock: (block: Block) => Promise<boolean>;
+    sendBlock: (block: Block) => Promise<string | undefined>;
     findLastBlocks: (limit: number | undefined, chain: string) => Promise<PublishedBlock[]>;
     getBlockByHash: (blockHash: string) => Promise<PublishedBlock | undefined>;
     getBlockPackByHeight: (chain: string, height: number) => Promise<BlockPack | undefined>;

@@ -8,7 +8,7 @@ export class BlocksActions {
         this.web3 = web3;
     }
 
-    sendBlock = async (block: Block): Promise<boolean> => {
+    sendBlock = async (block: Block): Promise<string | undefined> => {
         return await this.web3.network.sendAll(async (node) => {
             return await this.web3.network.api.publishNewBlock(node, block);
         });

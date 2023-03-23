@@ -33,6 +33,6 @@ export declare class NetworkActions {
     testConnections(): Promise<boolean>;
     addNode: (node: BywiseNode) => void;
     getRandomNode: (chain?: string | undefined) => BywiseNode;
-    sendAll(sendAction: SendAction, chain?: string): Promise<boolean>;
+    sendAll(sendAction: SendAction, chain?: string): Promise<string | undefined>;
     findAll<T>(filterAction: FilterAction<T>, chain?: string): Promise<T | undefined>;
 }

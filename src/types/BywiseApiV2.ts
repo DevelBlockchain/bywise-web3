@@ -36,13 +36,13 @@ export class BywiseApiV2 {
             })
             response.data = req.data;
             if (this.debug) {
-                console.log(`response`,response.data)
+                console.log(`response`, response.data)
             }
         } catch (err: any) {
-            response.error = `bywise-api error: ${err.message}`;
+            response.error = `${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
-                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error}`;
+                response.error = `${err.response.data.error}`;
             }
         }
         if (this.debug) {
@@ -68,13 +68,13 @@ export class BywiseApiV2 {
             })
             response.data = req.data;
             if (this.debug) {
-                console.log(`response`,response.data)
+                console.log(`response`, response.data)
             }
         } catch (err: any) {
-            response.error = `bywise-api error: ${err.message}`;
+            response.error = `${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
-                response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error}`;
+                response.error = `${err.response.statusText}: ${err.response.data.error}`;
             }
         }
         if (this.debug) {
@@ -154,7 +154,7 @@ export class BywiseApiV2 {
 
     getTxs(node: BywiseNode, chain: string, parameters: { offset?: number, limit?: number, asc?: boolean, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } }): Promise<BywiseResponse<PublishedTx[]>> {
         let query: any = {};
-        if(parameters.find) {
+        if (parameters.find) {
             query.searchBy = parameters.find.searchBy
             query.value = parameters.find.value
         }
@@ -166,7 +166,7 @@ export class BywiseApiV2 {
 
     countTxs(node: BywiseNode, parameters: { chain?: string, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } }): Promise<BywiseResponse<CountType>> {
         let query: any = {};
-        if(parameters.find) {
+        if (parameters.find) {
             query.searchBy = parameters.find.searchBy
             query.value = parameters.find.value
         }
@@ -178,16 +178,20 @@ export class BywiseApiV2 {
         return this.get(`${node.host}/api/v2/transactions/hash/${hash}`, node.token);
     }
 
+    getFeeTransaction(node: BywiseNode, simulateTx: SimulateTx): Promise<BywiseResponse<TxOutput>> {
+        return this.post(`${node.host}/api/v2/transactions/fee`, node.token, simulateTx);
+    }
+
     getContractByAddress(node: BywiseNode, chain: string, address: string): Promise<BywiseResponse<TxOutput>> {
-        return this.get(`${node.host}/api/v2/transactions/contract/${chain}/${address}`, node.token);
+        return this.get(`${node.host}/api/v2/contracts/abi/${chain}/${address}`, node.token);
+    }
+
+    getContractEventByAddress(node: BywiseNode, chain: string, address: string, event: string, byKey?: { key: string, value: string }): Promise<BywiseResponse<TxOutput>> {
+        return this.get(`${node.host}/api/v2/contracts/events/${chain}/${address}/${event}`, node.token, byKey);
     }
 
     trySimulate(node: BywiseNode, simulateTx: SimulateContract): Promise<BywiseResponse<OutputSimulateContract>> {
-        return this.post(`${node.host}/api/v2/transactions/simulate`, node.token, simulateTx);
-    }
-
-    getFeeTransaction(node: BywiseNode, simulateTx: SimulateTx): Promise<BywiseResponse<TxOutput>> {
-        return this.post(`${node.host}/api/v2/transactions/fee`, node.token, simulateTx);
+        return this.post(`${node.host}/api/v2/contracts/simulate`, node.token, simulateTx);
     }
 
     getWalletInfo(node: BywiseNode, address: string, chain: string): Promise<BywiseResponse<WalletInfo>> {

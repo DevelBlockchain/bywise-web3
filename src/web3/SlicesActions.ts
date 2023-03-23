@@ -8,7 +8,7 @@ export class SlicesActions {
         this.web3 = web3;
     }
 
-    sendSlice = async (slice: Slice): Promise<boolean> => {
+    sendSlice = async (slice: Slice): Promise<string | undefined> => {
         return await this.web3.network.sendAll(async (node) => {
             return await this.web3.network.api.publishNewSlice(node, slice);
         });

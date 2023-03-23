@@ -4,6 +4,7 @@ import { BlocksActions } from "./BlocksActions";
 import { NetworkActions, NetworkConfigs } from "./NetworkActions";
 import { SlicesActions } from "./SlicesActions";
 import { TransactionsActions } from "./TransactionsActions";
+import { ContractActions } from "./ContractActions";
 
 
 const defaultNetwork: { mainnet: Network, testnet: Network } = {
@@ -28,6 +29,7 @@ const defaultNetwork: { mainnet: Network, testnet: Network } = {
 export class Web3 {
     public readonly wallets: WalletsActions;
     public readonly network: NetworkActions;
+    public readonly contracts: ContractActions;
     public readonly transactions: TransactionsActions;
     public readonly blocks: BlocksActions;
     public readonly slices: SlicesActions;
@@ -68,6 +70,7 @@ export class Web3 {
         }
         this.network = new NetworkActions(networkConfigs);
         this.transactions = new TransactionsActions(this);
+        this.contracts = new ContractActions(this);
         this.wallets = new WalletsActions(this);
         this.blocks = new BlocksActions(this);
         this.slices = new SlicesActions(this);
