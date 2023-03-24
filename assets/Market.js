@@ -41,7 +41,7 @@ class Market {
         return this._feeCoef.get(token);
     }
 
-    owner() {  // @view
+    owner() { // @view
         return this._owner.get();
     }
 

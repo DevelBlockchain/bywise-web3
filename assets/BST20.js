@@ -1,11 +1,11 @@
 import BigNumber from 'bignumber.js';
 import BywiseUtils, { StorageValue, StorageMap, StorageList } from 'bywise-utils.js';
 
-const TOKEN_NAME = "SimpleToken";
-const TOKEN_SYMBOL = "TKN";
-const INITIAL_AMOUNT = '5000';
+const TOKEN_NAME = "Dhahab Sports";
+const TOKEN_SYMBOL = "DHS";
+const INITIAL_AMOUNT = '5000000000';
 const DECIMALS = 18;
-const ENABLE_MINT = true;
+const ENABLE_MINT = false;
 const FEES = [
 ]
 

@@ -1,11 +1,16 @@
 import { Web3 } from "./web3/Web3";
 import fs from 'fs';
 
-const chain = 'local';
+const chain = 'testnet';
 
 (async () => {
-    const web3 = new Web3({
+    /*const web3 = new Web3({
         initialNodes: ['http://localhost:3001'],
+        debug: false
+    });*/
+
+    const web3 = new Web3({
+        initialNodes: ['https://testnet-node1.bywise.org'],
         debug: false
     });
     const wallet = web3.wallets.importWallet('viable isolate cushion minor hold boss aunt weekend vehicle soda slow oil');
@@ -19,8 +24,8 @@ const chain = 'local';
 
     await web3.network.tryConnection();
 
-    const market = 'BWS1MCFD530DD0CD20Cd772A7C278E746A053B3Dc2f42376d';
-    const token = 'BWS1MCeF32378904342EC65126b941780777DF8c5965Facc5';
+    const market = 'BWS1MC263f5bBadd3C4580A065d8F0a67aC7418D37140f9ee';
+    const token = 'BWS1MCc62451D72F2a497D5a378129252824b7705355DCa54';
     /*
     const market = BywiseHelper.getBWSAddressContract();
     const token = BywiseHelper.getBWSAddressContract();
@@ -101,48 +106,90 @@ const chain = 'local';
     let outputF = await web3.transactions.sendTransactionSync(txWithoutFee);
     console.log('transfer without gas', outputF.error, outputF.output)
     /**/
-/*
-    let output = await web3.transactions.readContract(
-        chain,
-        token,
-        'balanceOf',
-        [w1.address]
-    );
-    console.log('balanceOf w1', parseFloat(output.output) / (10 ** 18))
 
-    output = await web3.transactions.readContract(
-        chain,
-        token,
-        'balanceOf',
-        [market]
-    );
-    console.log('balanceOf market', parseFloat(output.output) / (10 ** 18))
-    
-    output = await web3.transactions.readContract(
+    let output = await web3.contracts.readContract(
         chain,
         market,
-        'getBalance',
-        [token]
+        'simulateFee',
+        [token, '0.1']
     );
-    console.log('getBalance', parseFloat(output.output) / (10 ** 18))
+    console.log('simulateFee', parseFloat(output.output) / (10 ** 18))
 
-    output = await web3.transactions.readContract(
-        chain,
-        market,
-        'getBalanceBWS',
-        [token]
-    );
-    console.log('getBalanceBWS', parseFloat(output.output))
-
-    output = await web3.transactions.readContract(
+    let eventsFrom: any = await web3.contracts.getContractEventByAddress(
         chain,
         token,
-        'balanceOf',
-        [w2.address]
+        'Transfer',
+        {
+            key: 'from',
+            value: 'BWS1MU32B25f77Af616041C173A4859EAF2c39420D386393d'
+        }
     );
-    console.log('balanceOf w2', parseFloat(output.output) / (10 ** 18))*/
+    let eventsTo: any = await web3.contracts.getContractEventByAddress(
+        chain,
+        token,
+        'Transfer',
+        {
+            key: 'to',
+            value: 'BWS1MU32B25f77Af616041C173A4859EAF2c39420D386393d'
+        }
+    );
+    let events = [...eventsFrom, ...eventsTo].sort((e1, e2) => e2.create - e1.create);
+    events = events.filter((event, index) => {
+        let repeted = true;
+        for (let i = index + 1; i < events.length; i++) {
+            if (events[i].hash === event.hash) {
+                repeted = false;
+            }
+        }
+        return repeted;
+    });
+    events = events.map(event => ({ create: event.create, ...(JSON.parse(event.data))}))
 
+    console.log('events', events)
+
+
+    /*
+        let output = await web3.transactions.readContract(
+            chain,
+            token,
+            'balanceOf',
+            [w1.address]
+        );
+        console.log('balanceOf w1', parseFloat(output.output) / (10 ** 18))
     
+        output = await web3.transactions.readContract(
+            chain,
+            token,
+            'balanceOf',
+            [market]
+        );
+        console.log('balanceOf market', parseFloat(output.output) / (10 ** 18))
+        
+        output = await web3.transactions.readContract(
+            chain,
+            market,
+            'getBalance',
+            [token]
+        );
+        console.log('getBalance', parseFloat(output.output) / (10 ** 18))
+    
+        output = await web3.transactions.readContract(
+            chain,
+            market,
+            'getBalanceBWS',
+            [token]
+        );
+        console.log('getBalanceBWS', parseFloat(output.output))
+    
+        output = await web3.transactions.readContract(
+            chain,
+            token,
+            'balanceOf',
+            [w2.address]
+        );
+        console.log('balanceOf w2', parseFloat(output.output) / (10 ** 18))*/
+
+
     /*console.log('create web3 ');
     console.log('test connection', await web3.network.testConnections())
     await web3.network.tryConnection();
