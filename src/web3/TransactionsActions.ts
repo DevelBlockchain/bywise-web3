@@ -198,13 +198,15 @@ export class TransactionsActions {
         this.buildConfig = new ConfigTransactions(web3);
     }
 
-    buildSimpleTx = async (wallet: Wallet, chain: string, to: string, amount: string, type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
+    buildSimpleTx = async (wallet: Wallet, chain: string, to: string | string[], amount: string | string[], type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
+        const node = await this.web3.network.getRandomNode();
+        const info = await this.web3.network.api.getInfo(node.host);
         let tx = new Tx();
         tx.chain = chain;
         tx.version = "2";
         tx.from = [wallet.address];
-        tx.to = [to];
-        tx.amount = [amount];
+        tx.to = Array.isArray(to) ? to : [to];
+        tx.amount = Array.isArray(amount) ? amount : [amount];
         tx.type = type ? type : TxType.TX_NONE;
         if (type) {
             tx.data = data ? data : {};
@@ -212,7 +214,7 @@ export class TransactionsActions {
             tx.data = {};
         }
         tx.foreignKeys = foreignKeys ? foreignKeys : [];
-        tx.created = Math.floor(Date.now() / 1000);
+        tx.created = info.data.timestamp;
         tx.fee = (await this.estimateFee(tx)).feeUsed;
         tx.hash = tx.toHash();
         tx.sign = [await wallet.signHash(tx.hash)];

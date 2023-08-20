@@ -33,7 +33,7 @@ export declare class TransactionsActions {
     private readonly web3;
     buildConfig: ConfigTransactions;
     constructor(web3: Web3);
-    buildSimpleTx: (wallet: Wallet, chain: string, to: string, amount: string, type?: TxType | undefined, data?: any, foreignKeys?: string[] | undefined) => Promise<Tx>;
+    buildSimpleTx: (wallet: Wallet, chain: string, to: string | string[], amount: string | string[], type?: TxType | undefined, data?: any, foreignKeys?: string[] | undefined) => Promise<Tx>;
     signTx: (wallets: Wallet[], tx: Tx) => Promise<Tx>;
     estimateFee: (tx: Tx) => Promise<TxOutput>;
     sendTransactionSync: (tx: Tx) => Promise<TxOutput>;
