@@ -60,6 +60,7 @@ export class Block implements BywiseTransaction {
     isValid(): void {
         if (!BywiseHelper.isValidInteger(this.height)) throw new Error('invalid block height');
         if (!BywiseHelper.isValidInteger(this.transactionsCount)) throw new Error('invalid block transactionsCount');
+        if (!BywiseHelper.isStringArray(this.slices)) throw new Error('invalid array');
         for (let i = 0; i < this.slices.length; i++) {
             let sliceHash = this.slices[i];
             if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid block hash ${i} - ${sliceHash}`);
@@ -75,6 +76,12 @@ export class Block implements BywiseTransaction {
         if (!BywiseHelper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);
         if (this.hash !== this.toHash()) throw new Error(`corrupt transaction`);
         if (!BywiseHelper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid block signature');
+
+        if (!BywiseHelper.isStringArray(this.externalTxID)) throw new Error('invalid array');
+        for (let i = 0; i < this.externalTxID.length; i++) {
+            let txId = this.externalTxID[i];
+            if (!BywiseHelper.isValidHash(txId)) throw new Error(`invalid externalTxID txId ${i} - ${txId}`);
+        }
     }
 }
 
