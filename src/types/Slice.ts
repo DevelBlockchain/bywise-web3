@@ -11,7 +11,7 @@ export class Slice implements BywiseTransaction {
     blockHeight: number;
     transactions: string[];
     transactionsCount: number;
-    transactionsData?: SliceData[];
+    transactionsData?: SliceData[]; // atomic swap
     version: string;
     chain: string;
     from: string;
@@ -79,29 +79,36 @@ export class Slice implements BywiseTransaction {
     }
 
     isValid(): void {
-        if (typeof this.height !== 'number') throw new Error('invalid slice height ' + this.height);
-        if (this.height < 0) throw new Error('invalid slice height ' + this.height);
+        if (!BywiseHelper.isValidInteger(this.height)) throw new Error('invalid slice height');
+        
+        if (!BywiseHelper.isValidInteger(this.blockHeight)) throw new Error('invalid slice blockHeight');
+        
+        if (!BywiseHelper.isValidInteger(this.transactionsCount)) throw new Error('invalid slice transactionsCount');
 
-        if (typeof this.blockHeight !== 'number') throw new Error('invalid slice blockHeight ' + this.blockHeight);
-        if (this.blockHeight < 0) throw new Error('invalid slice blockHeight ' + this.blockHeight);
-
-        if (typeof this.transactionsCount !== 'number') throw new Error('invalid slice transactionsCount ' + this.transactionsCount);
-        if (this.transactionsCount < 0) throw new Error('invalid slice transactionsCount ' + this.transactionsCount);
-
-        if (this.transactions.length == 0) throw new Error('invalid slice length');
+        if (!BywiseHelper.isStringArray(this.transactions)) throw new Error('invalid array');
+        if (this.transactions.length === 0) throw new Error('invalid slice length');
+        if (this.transactions.length !== this.transactionsCount) throw new Error('invalid slice length');
         for (let i = 0; i < this.transactions.length; i++) {
             let txHash = this.transactions[i];
             if (!BywiseHelper.isValidHash(txHash)) throw new Error(`invalid tx hash ${i} - ${txHash}`);
         }
-        if (this.version !== '2') throw new Error('invalid slice version ' + this.version);
+        if(this.transactionsData) {
+            if (this.transactionsData.length > this.transactions.length) throw new Error('invalid slice transactionsData length');
+            for (let i = 0; i < this.transactionsData.length; i++) {
+                let data = this.transactionsData[i];
+                if (!BywiseHelper.isValidHash(data.hash)) throw new Error(`invalid dataTx hash ${i} - ${data.hash}`);
+                if (!BywiseHelper.isStringArray(data.data)) throw new Error(`invalid dataTx data ${i} - ${data.hash}`);
+            }
+        }
+        if (this.version !== '1' && this.version !== '2') throw new Error('invalid version');
         if (this.version == '2') {
             if (this.chain.length === 0) throw new Error('invalid slice chain cant be empty');
             if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid slice from address ' + this.from);
-        if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid slice created date ' + this.created);
-        if (this.end !== true && this.end !== false) throw new Error('invalid slice end flag ' + this.version);
-        if (this.hash !== this.toHash()) throw new Error(`invalid slice hash ${this.hash} ${this.toHash()}`);
+        if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
+        if (this.end !== true && this.end !== false) throw new Error('invalid slice end flag');
+        if (this.hash !== this.toHash()) throw new Error(`corrupt transaction`);
         if (!BywiseHelper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid slice signature');
     }
 }

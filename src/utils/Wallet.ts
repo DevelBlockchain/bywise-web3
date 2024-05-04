@@ -5,15 +5,17 @@ export class Wallet {
     public readonly seed: string;
     public readonly publicKey: string;
     public readonly address: string;
-    private readonly account: ethers.Wallet;
+    private readonly account: ethers.HDNodeWallet;
 
     constructor(config?: { isMainnet?: boolean, seed?: string }) {
-        if (config) {
-            this.seed = config.seed ? config.seed : ethers.Wallet.createRandom()._mnemonic().phrase;
+        if (config && config.seed) {
+            this.seed = config.seed;
         } else {
-            this.seed = ethers.Wallet.createRandom()._mnemonic().phrase;
+            let mnemonic = ethers.Wallet.createRandom().mnemonic
+            if(!mnemonic) throw new Error('cant generate mnemonic phrase')
+            this.seed = mnemonic.phrase;
         }
-        this.account = ethers.Wallet.fromMnemonic(this.seed);
+        this.account = ethers.Wallet.fromPhrase(this.seed);
         this.publicKey = this.account.publicKey;
         this.address = this.getAddress();
     }

@@ -1,17 +1,18 @@
-import { sha256, base16Decode, base16Encode } from '@waves/ts-lib-crypto';
+import CryptoJS from "crypto-js";
 import { ethers } from "ethers";
 import { InfoAddress } from '../types/InfoAddress';
-const ethereum_address = require('ethereum-address');
+import { isAddress } from 'web3-validator';
 
 export class BywiseHelper {
     static readonly ZERO_ADDRESS = 'BWS000000000000000000000000000000000000000000000';
 
-    static makeHashV1(hexBytes: string) {
-        return base16Encode(sha256(base16Decode(hexBytes))).toLowerCase();
+    static makeHashV1(hexBytes: string) 
+    {
+        return CryptoJS.SHA256(CryptoJS.SHA256(CryptoJS.enc.Hex.parse(hexBytes))).toString();
     }
 
     static makeHash(hexBytes: string) {
-        return base16Encode(sha256(sha256(base16Decode(hexBytes)))).toLowerCase();
+        return CryptoJS.SHA256(CryptoJS.SHA256(CryptoJS.enc.Hex.parse(hexBytes))).toString();
     }
 
     static getBWSAddressContract = () => {
@@ -51,7 +52,8 @@ export class BywiseHelper {
         let checkSum = address.substring(address.length - 3);
         let checkSumCalculed = BywiseHelper.makeHash(address.substring(0, address.length - 3)).substring(0, 3);
         if (checkSum !== checkSumCalculed) throw new Error('corrupted address');
-        if (!ethereum_address.isAddress(ethAddress)) throw new Error('invalid address parameters');
+        if (!isAddress(ethAddress)) throw new Error('invalid address parameters');
+        
         return new InfoAddress({
             version: '1',
             isContract,
@@ -69,11 +71,24 @@ export class BywiseHelper {
     }
 
     static isValidAddress = (address: string) => {
-        return /^(BWS1[MT][CU][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
+        let valid = /^(BWS1[MT][CU][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
+        if(valid) {
+            let ethAddress = '0x' + address.substring(6, 46);
+            valid = isAddress(ethAddress)
+        }
+        return valid;
     }
     
     static isContractAddress = (address: string) => {
         return /^(BWS1[MT][C][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
+    }
+
+    static isStringArray = (arr: any) => {
+        if(!Array.isArray(arr)) return false;
+        for (let i = 0; i < arr.length; i++) {
+            if(typeof arr[i] !== 'string') return false;
+        }
+        return true;
     }
 
     static isValidAmount = (amount: string) => {
@@ -88,8 +103,13 @@ export class BywiseHelper {
         return /^[a-f0-9]{64}$/.test(value);
     }
 
+    static isValidInteger = (height: number) => {
+        if (typeof height !== 'number') return false;
+        return /^[0-9]{1,10}$/.test(`${height}`);
+    }
+
     static isValidDate = (date: number) => {
-        if (typeof date !== 'number') return false;;
+        if (typeof date !== 'number') return false;
         return /^[0-9]{10}$/.test(`${date}`);
     }
 
@@ -97,7 +117,7 @@ export class BywiseHelper {
         if (!/^0x[a-f0-9]{130}$/.test(sign)) {
             return false;
         }
-        let recoveredAddress = ethers.utils.verifyMessage(hash, sign);
+        let recoveredAddress = ethers.verifyMessage(hash, sign);
         let decodedSignAddress = BywiseHelper.decodeBWSAddress(signAddress);
         if (recoveredAddress !== decodedSignAddress.ethAddress) {
             return false;
@@ -111,7 +131,7 @@ export class BywiseHelper {
             if (Array.isArray(json)) {
                 newJSON = json.map(value => toJSON(value))
             } else if (json === null || json === undefined) {
-                newJSON = json;
+                newJSON = null;
             } else if (typeof json === 'object') {
                 let obj: any = {};
                 Object.entries(json).sort((a, b) => a[0].localeCompare(b[0], 'en')).forEach(([key, value]) => {

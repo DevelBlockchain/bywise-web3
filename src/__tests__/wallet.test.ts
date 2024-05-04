@@ -1,3 +1,4 @@
+import { Tx } from '../types';
 import {Wallet, BywiseHelper} from '../utils';
 
 test('Create and import wallet', async () => {

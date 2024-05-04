@@ -58,23 +58,22 @@ export class Block implements BywiseTransaction {
     }
 
     isValid(): void {
-        if (typeof this.height !== 'number') throw new Error('invalid block height ' + this.height);
-        if (this.height < 0) throw new Error('invalid block height ' + this.height);
-        if (typeof this.transactionsCount !== 'number') throw new Error('invalid block transactionsCount ' + this.transactionsCount);
-        if (this.transactionsCount < 0) throw new Error('invalid block transactionsCount ' + this.transactionsCount);
+        if (!BywiseHelper.isValidInteger(this.height)) throw new Error('invalid block height');
+        if (!BywiseHelper.isValidInteger(this.transactionsCount)) throw new Error('invalid block transactionsCount');
         for (let i = 0; i < this.slices.length; i++) {
             let sliceHash = this.slices[i];
-            if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid slice hash ${i} - ${sliceHash}`);
+            if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid block hash ${i} - ${sliceHash}`);
         }
+        if (this.transactionsCount > this.slices.length) throw new Error('invalid block transactionsCount');
         if (this.version !== '1' && this.version !== '2') throw new Error('invalid block version ' + this.version);
         if(this.version == '2') {
             if (this.chain.length === 0) throw new Error('invalid block chain cant be empty');
             if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid block from address ' + this.from);
-        if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid block created date ' + this.created);
+        if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
         if (!BywiseHelper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);
-        if (this.hash !== this.toHash()) throw new Error(`invalid block hash ${this.hash} ${this.toHash()}`);
+        if (this.hash !== this.toHash()) throw new Error(`corrupt transaction`);
         if (!BywiseHelper.isValidSign(this.sign, this.from, this.hash)) throw new Error('invalid block signature');
     }
 }

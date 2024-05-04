@@ -96,16 +96,19 @@ export class Tx implements BywiseTransaction {
             if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
         if (this.validator && !BywiseHelper.isValidAddress(this.validator)) throw new Error('invalid transaction validator address ' + this.validator);
+        if (!BywiseHelper.isStringArray(this.from)) throw new Error('invalid array');
         if (this.from.length === 0) throw new Error('invalid transaction sender cant be empty');
         if (this.from.length > 100) throw new Error('maximum number of senders is 100 signatures');
         this.from.forEach(from => {
             if (!BywiseHelper.isValidAddress(from)) throw new Error('invalid transaction sender address ' + from);
         })
+        if (!BywiseHelper.isStringArray(this.to)) throw new Error('invalid array');
         if (this.to.length === 0) throw new Error('invalid transaction recipient cant be empty');
         if (this.to.length > 100) throw new Error('maximum number of recipient is 100');
         this.to.forEach((to, i) => {
             if (!BywiseHelper.isValidAddress(to)) throw new Error('invalid transaction recipient address ' + to);
         })
+        if (!BywiseHelper.isStringArray(this.amount)) throw new Error('invalid array');
         if (this.amount.length === 0) throw new Error('invalid transaction amount cant be empty');
         if (this.amount.length !== this.to.length) throw new Error('to field must be the same length as amount');
         this.amount.forEach(amount => {
@@ -114,28 +117,30 @@ export class Tx implements BywiseTransaction {
         if (!BywiseHelper.isValidAmount(this.fee)) throw new Error('invalid transaction fee ' + this.fee);
         if (!Object.values(TxType).map(t => t.toString()).includes(this.type)) throw new Error('invalid type ' + this.type);
         if (this.foreignKeys) {
-            if (this.to.length > 100) throw new Error('maximum number of foreignKeys is 100');
+            if (!BywiseHelper.isStringArray(this.foreignKeys)) throw new Error('invalid array');
+            if (this.foreignKeys.length > 100) throw new Error('maximum number of foreignKeys is 100');
             this.foreignKeys.forEach(key => {
                 if (!BywiseHelper.isValidAlfaNum(key)) throw new Error('invalid foreignKey ' + key);
             })
         }
         if (BywiseHelper.jsonToString(this.data).length > 1048576) throw new Error('data too large ' + BywiseHelper.jsonToString(this.data).length);
-        if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date ' + this.created);
+        if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
         if (!BywiseHelper.isValidHash(this.hash)) throw new Error('invalid transaction hash ' + this.hash);
-        if (this.hash !== this.toHash()) throw new Error('calculated hash is different from the informed hash');
+        if (this.hash !== this.toHash()) throw new Error('corrupt transaction');
         if (this.validator) {
             if (!this.validatorSign) throw new Error('validator sign cant be empty');
             if (!BywiseHelper.isValidSign(this.validatorSign, this.validator, this.hash)) throw new Error('invalid validator signature');
         } else {
             if (this.validatorSign) throw new Error('validator address cant be empty');
         }
-        if (this.sign.length === 0) throw new Error('invalid transaction sign cant be empty');
-        if (this.sign.length !== this.from.length) throw new Error('from field must be the same length as sign');
+        if (!BywiseHelper.isStringArray(this.sign)) throw new Error('invalid array');
+        if (this.sign.length === 0) throw new Error('transaction was not signed');
+        if (this.sign.length !== this.from.length) throw new Error('invalid signature');
         for (let i = 0; i < this.sign.length; i++) {
             const sign = this.sign[i];
             const fromAddress = this.from[i];
             
-            if (!BywiseHelper.isValidSign(sign, fromAddress, this.hash)) throw new Error('invalid signature from address ' + fromAddress);
+            if (!BywiseHelper.isValidSign(sign, fromAddress, this.hash)) throw new Error('invalid signature');
         }
     }
 }
