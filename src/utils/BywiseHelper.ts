@@ -66,6 +66,11 @@ export class BywiseHelper {
         return BywiseHelper.decodeBWSAddress(address).tag;
     }
 
+    static getStealthAddressFromExtendedPublicKey = (xpub: string, index: number): string => {
+        const node = ethers.HDNodeWallet.fromExtendedKey(xpub).derivePath(`${index}`);
+        return BywiseHelper.encodeBWSAddress(false, node.address, '');
+    }
+
     static isZeroAddress = (address: string) => {
         return address === BywiseHelper.ZERO_ADDRESS;
     }

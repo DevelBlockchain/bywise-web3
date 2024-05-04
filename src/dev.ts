@@ -7,7 +7,6 @@ import { ethers } from "ethers";
   console.log(wallet.address, seed, wallet.path);
 
   const masterNode = ethers.HDNodeWallet.fromPhrase(seed, undefined, "m/44'/60'/0'/0/0");
-
   const xpub = masterNode.neuter().extendedKey; 
   console.log('xpub', xpub)
   const publicNode = ethers.HDNodeWallet.fromExtendedKey(xpub);
