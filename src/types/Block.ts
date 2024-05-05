@@ -65,7 +65,6 @@ export class Block implements BywiseTransaction {
             let sliceHash = this.slices[i];
             if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid block hash ${i} - ${sliceHash}`);
         }
-        if (this.transactionsCount > this.slices.length) throw new Error('invalid block transactionsCount');
         if (this.version !== '1' && this.version !== '2') throw new Error('invalid block version ' + this.version);
         if(this.version == '2') {
             if (this.chain.length === 0) throw new Error('invalid block chain cant be empty');

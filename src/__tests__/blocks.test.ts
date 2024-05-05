@@ -109,12 +109,11 @@ test('Test transactionsCount - v2', async () => {
     block.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
     block.hash = block.toHash();
     block.sign = await w1.signHash(block.hash);
-
     await expect(() => {
         block.isValid();
     }).not.toThrow();
 
-    block.transactionsCount = 0;
+    block.transactionsCount = 5;
     block.hash = block.toHash();
     block.sign = await w1.signHash(block.hash);
     await expect(() => {
@@ -204,7 +203,6 @@ test('Test slices - v2', async () => {
     }).not.toThrow();
 
     block.slices = [];
-    block.transactionsCount = 0;
     block.hash = block.toHash();
     block.sign = await w1.signHash(block.hash);
     await expect(() => {
@@ -212,23 +210,6 @@ test('Test slices - v2', async () => {
     }).not.toThrow();
     
     block.slices = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
-    block.transactionsCount = 1;
-    block.hash = block.toHash();
-    block.sign = await w1.signHash(block.hash);
-    await expect(() => {
-        block.isValid();
-    }).not.toThrow();
-
-    block.slices = [];
-    block.transactionsCount = 1;
-    block.hash = block.toHash();
-    block.sign = await w1.signHash(block.hash);
-    await expect(() => {
-        block.isValid();
-    }).toThrow();
-    
-    block.slices = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
-    block.transactionsCount = 0;
     block.hash = block.toHash();
     block.sign = await w1.signHash(block.hash);
     await expect(() => {
@@ -236,7 +217,6 @@ test('Test slices - v2', async () => {
     }).not.toThrow();
     
     block.slices = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
-    block.transactionsCount = 2;
     block.hash = block.toHash();
     block.sign = await w1.signHash(block.hash);
     await expect(() => {
@@ -244,7 +224,6 @@ test('Test slices - v2', async () => {
     }).not.toThrow();
 
     block.slices = ['asdfasdf'];
-    block.transactionsCount = 1;
     block.hash = block.toHash();
     block.sign = await w1.signHash(block.hash);
     await expect(() => {
