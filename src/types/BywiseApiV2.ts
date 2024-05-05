@@ -1,9 +1,8 @@
-import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo, PublishedTx, BywiseResponse, BlockPack, OutputSimulateContract, SimulateContract } from '.';
+import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, PublishedTx, BywiseResponse, BlockPack, OutputSimulateContract, SimulateContract } from '.';
 import { WalletInfo } from '../utils';
 import { Block, PublishedBlock } from './Block';
 import { CountType } from './BywiseNode';
 import { PublishedSlice } from './Slice';
-const axios = require('axios');
 
 export class BywiseApiV2 {
 
@@ -26,15 +25,23 @@ export class BywiseApiV2 {
         let response: BywiseResponse<any> = {
             data: {}
         };
+
+        const AbortController = globalThis.AbortController
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            controller.abort();
+        }, 30000);
+
         try {
-            let req = await axios.get(url + params, {
+            const req = await fetch(url + params, {
+                method: 'GET',
+                signal: controller.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token ? { 'Authorization': `Node ${token}` } : {})
                 },
-                timeout: 30000
-            })
-            response.data = req.data;
+            });
+            response.data = await req.json();
             if (this.debug) {
                 console.log(`response`, response.data)
             }
@@ -44,7 +51,10 @@ export class BywiseApiV2 {
                 response.data = err.response.data;
                 response.error = `${err.response.data.error}`;
             }
+        } finally {
+            clearTimeout(timeout);
         }
+
         if (this.debug) {
             console.log(`get ${url + params}`)
             if (response.error) {
@@ -58,15 +68,25 @@ export class BywiseApiV2 {
         let response: BywiseResponse<any> = {
             data: {}
         };
+
+        const AbortController = globalThis.AbortController
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            controller.abort();
+        }, 30000);
+
         try {
-            let req = await axios.post(url, parameters, {
+            const req = await fetch(url, {
+                method: 'POST',
+                signal: controller.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token ? { 'Authorization': `Node ${token}` } : {})
                 },
-                timeout: 30000
-            })
-            response.data = req.data;
+                body: JSON.stringify(parameters)
+            });
+            response.data = await req.json();
+
             if (this.debug) {
                 console.log(`response`, response.data)
             }
@@ -76,7 +96,10 @@ export class BywiseApiV2 {
                 response.data = err.response.data;
                 response.error = `${err.response.statusText}: ${err.response.data.error}`;
             }
+        } finally {
+            clearTimeout(timeout);
         }
+
         if (this.debug) {
             console.log(`post ${url}`)
             if (response.error) {

@@ -2,7 +2,6 @@ import { Tx, BywiseNode, SimulateTx, Slice, TxOutput, InfoNode, TxBlockchainInfo
 import { WalletInfo } from '../utils';
 import { Block } from './Block';
 import { CountType } from './BywiseNode';
-const axios = require('axios');
 
 export class BywiseApiV1 {
 
@@ -22,21 +21,31 @@ export class BywiseApiV1 {
         let response: BywiseResponse<any> = {
             data: {}
         };
+
+        const AbortController = globalThis.AbortController
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            controller.abort();
+        }, 30000);
+
         try {
-            let req = await axios.get(url + params, {
+            const req = await fetch(url + params, {
+                method: 'GET',
+                signal: controller.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token ? { 'Authorization': `Node ${token}` } : {})
                 },
-                timeout: 30000
-            })
-            response.data = req.data;
+            });
+            response.data = await req.json();
         } catch (err: any) {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
                 response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error.message}`;
             }
+        } finally {
+            clearTimeout(timeout);
         }
         if (this.debug) {
             console.log(`get ${url + params}`)
@@ -51,22 +60,34 @@ export class BywiseApiV1 {
         let response: BywiseResponse<any> = {
             data: {}
         };
+
+        const AbortController = globalThis.AbortController
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            controller.abort();
+        }, 30000);
+
         try {
-            let req = await axios.post(url, parameters, {
+            const req = await fetch(url, {
+                method: 'POST',
+                signal: controller.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     ...(token ? { 'Authorization': `Node ${token}` } : {})
                 },
-                timeout: 30000
-            })
-            response.data = req.data;
+                body: JSON.stringify(parameters)
+            });
+            response.data = await req.json();
         } catch (err: any) {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {
                 response.data = err.response.data;
                 response.error = `bywise-api error ${err.response.statusText}: ${err.response.data.error.message}`;
             }
+        } finally {
+            clearTimeout(timeout);
         }
+
         if (this.debug) {
             console.log(`post ${url}`)
             if (response.error) {

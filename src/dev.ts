@@ -1,12 +1,12 @@
-import { Web3 } from "./index.js";
+import { Web3 } from './web3/Web3'
 
 (async () => {
   const chain = 'testnet';
-  
+
   const web3 = new Web3({
     initialNodes: ['https://testnet-node1.bywise.org'],
   });
-  
+
   const wallet = web3.wallets.createWallet();
 
   await web3.network.tryConnection();
