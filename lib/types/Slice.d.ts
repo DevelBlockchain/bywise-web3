@@ -1,5 +1,5 @@
 import { BywiseTransaction } from "./BywiseTransaction";
-export declare type SliceData = {
+export type SliceData = {
     hash: string;
     data: string[];
 };
@@ -22,7 +22,7 @@ export declare class Slice implements BywiseTransaction {
     toHash(): string;
     isValid(): void;
 }
-export declare type PublishedSlice = {
+export type PublishedSlice = {
     height: number;
     blockHeight: number;
     transactions: string[];

@@ -37,7 +37,7 @@ export declare class Tx implements BywiseTransaction {
     toHash(): string;
     isValid(): void;
 }
-export declare type SimulateTx = {
+export type SimulateTx = {
     chain: string;
     from: string[] | string;
     to: string[] | string;
@@ -46,7 +46,7 @@ export declare type SimulateTx = {
     type: string;
     data: any;
 };
-export declare type SimulateContract = {
+export type SimulateContract = {
     code?: string;
     method?: string;
     inputs?: string[];
@@ -55,13 +55,13 @@ export declare type SimulateContract = {
     amount: number;
     env: any;
 };
-export declare type OutputSimulateContract = {
+export type OutputSimulateContract = {
     error?: string;
     stack?: string;
     output: any;
     env: any;
 };
-export declare type TxOutput = {
+export type TxOutput = {
     cost?: number;
     size?: number;
     feeUsed: string;
@@ -70,7 +70,7 @@ export declare type TxOutput = {
     error?: string;
     output?: any;
 };
-export declare type PublishedTx = {
+export type PublishedTx = {
     version: string;
     validator?: string;
     from: string[];
@@ -87,7 +87,7 @@ export declare type PublishedTx = {
     status: string;
     output: TxOutput;
 };
-export declare type TxBlockchainInfo = {
+export type TxBlockchainInfo = {
     tx: PublishedTx;
     slice?: Slice;
     block?: Block;

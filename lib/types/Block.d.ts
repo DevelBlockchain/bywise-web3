@@ -16,7 +16,7 @@ export declare class Block implements BywiseTransaction {
     toHash(): string;
     isValid(): void;
 }
-export declare type PublishedBlock = {
+export type PublishedBlock = {
     height: number;
     slices: string[];
     transactionsCount: number;

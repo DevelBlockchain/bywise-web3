@@ -39,6 +39,6 @@ export declare class ContractActions {
     getContractEventByAddress: (chain: string, address: string, event: string, byKey?: {
         key: string;
         value: string;
-    } | undefined) => Promise<TxOutput | undefined>;
+    }) => Promise<TxOutput | undefined>;
 }
 export {};

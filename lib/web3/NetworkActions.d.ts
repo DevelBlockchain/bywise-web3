@@ -1,7 +1,7 @@
 import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse } from "../types";
-export declare type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>;
-export declare type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
-export declare type NetworkConfigs = {
+export type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>;
+export type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
+export type NetworkConfigs = {
     isClient: boolean;
     myHost: string;
     initialNodes: string[];
@@ -32,7 +32,7 @@ export declare class NetworkActions {
     tryConnection: () => Promise<number>;
     testConnections(): Promise<boolean>;
     addNode: (node: BywiseNode) => void;
-    getRandomNode: (chain?: string | undefined) => BywiseNode;
+    getRandomNode: (chain?: string) => BywiseNode;
     sendAll(sendAction: SendAction, chain?: string): Promise<string | undefined>;
     findAll<T>(filterAction: FilterAction<T>, chain?: string): Promise<T | undefined>;
 }

@@ -7,12 +7,12 @@ export declare class BywiseNode {
     token?: string;
     constructor(config: Partial<BywiseNode>);
 }
-export declare type ConfigNode = {
+export type ConfigNode = {
     name: string;
     value: string;
     type: string;
 };
-export declare type InfoNode = {
+export type InfoNode = {
     address: string;
     host: string;
     version: string;
@@ -21,6 +21,6 @@ export declare type InfoNode = {
     explorers: string[];
     nodes: BywiseNode[];
 };
-export declare type CountType = {
+export type CountType = {
     count: number;
 };

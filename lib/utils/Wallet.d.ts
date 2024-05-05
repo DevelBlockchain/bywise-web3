@@ -7,10 +7,13 @@ export declare class Wallet {
         isMainnet?: boolean;
         seed?: string;
     });
+    getExtendedPublicKey: (account: number) => string;
     getAddress: (tag?: string) => string;
+    getStealthAddress: (account: number, index: number, tag?: string) => string;
     signHash: (hash: string) => Promise<string>;
+    signStealthAddressHash: (hash: string, account: number, index: number) => Promise<string>;
 }
-export declare type WalletInfo = {
+export type WalletInfo = {
     balance: string;
     address: string;
     name?: string;

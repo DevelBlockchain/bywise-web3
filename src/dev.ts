@@ -1,21 +1,24 @@
-import { ethers } from "ethers";
+import { Web3 } from "./index.js";
 
 (async () => {
-  const wallet = ethers.Wallet.createRandom();
-  const seed = wallet.mnemonic?.phrase;
-  if (!seed) throw new Error('cant generate mnemonic phrase')
-  console.log(wallet.address, seed, wallet.path);
+  const chain = 'testnet';
+  
+  const web3 = new Web3({
+    initialNodes: ['https://testnet-node1.bywise.org'],
+  });
+  
+  const wallet = web3.wallets.createWallet();
 
-  const masterNode = ethers.HDNodeWallet.fromPhrase(seed, undefined, "m/44'/60'/0'/0/0");
-  const xpub = masterNode.neuter().extendedKey; 
-  console.log('xpub', xpub)
-  const publicNode = ethers.HDNodeWallet.fromExtendedKey(xpub);
+  await web3.network.tryConnection();
+  console.log('connected web3');
 
-  console.log(masterNode.address, masterNode.mnemonic?.phrase, masterNode.path);
-  console.log(publicNode.address, publicNode.path)
+  if (!(await web3.network.testConnections())) {
+    throw new Error('connection failed');
+  }
 
-  const node = masterNode.deriveChild(1);
-  const pnode = publicNode.deriveChild(1);
-  console.log(node.address, node.path);
-  console.log(pnode.address, pnode.path);
+  const receiveAddress = 'BWS1MUf9c74C61328A289B74EC5eD6F8dC994e90449e9c0ca';
+
+  const tx = await web3.transactions.buildSimpleTx(wallet, chain, receiveAddress, '100');
+
+  await web3.transactions.sendTransactionSync(tx);
 })();

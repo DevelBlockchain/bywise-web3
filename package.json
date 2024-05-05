@@ -1,6 +1,6 @@
 {
   "name": "@bywise/web3",
-  "version": "0.10.3",
+  "version": "1.0.0",
   "description": "Web3 connector of Bywise",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/DevelBlockchain/bywise-web3.git"
+    "url": "git+https://github.com/DevelBlockchain/bywise-web3.git"
   },
   "keywords": [
     "web3",
