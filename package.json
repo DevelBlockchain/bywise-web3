@@ -24,8 +24,8 @@
     "bywise",
     "blockchain"
   ],
-  "author": "Devel Blockchain",
-  "license": "ISC",
+  "author": "Devel Blockchain <contact@develblockchain.com>",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/DevelBlockchain/bywise-web3/issues"
   },
