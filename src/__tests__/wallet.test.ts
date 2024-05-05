@@ -1,3 +1,4 @@
+import { Tx } from '../types';
 import {Wallet, BywiseHelper} from '../utils';
 
 test('Create and import wallet', async () => {
@@ -38,4 +39,18 @@ test('Test Corrupted addresses', async () => {
     await expect(() => {
         BywiseHelper.decodeBWSAddress(corruptedAddress)
     }).toThrow();
+});
+
+test('Test Stealth Addresses', async () => {
+    const wallet = new Wallet();
+
+    const account = 100;
+    const xpub = wallet.getExtendedPublicKey(account);
+
+    for (let i = 0; i < 10; i++) {
+        const nextAccountAddress = BywiseHelper.getStealthAddressFromExtendedPublicKey(xpub, i);
+        const accountAddress = wallet.getStealthAddress(account, i);
+        
+        await expect(nextAccountAddress).toBe(accountAddress);
+    }
 });
