@@ -38,6 +38,10 @@ export class BywiseApiV1 {
                 },
             });
             response.data = await req.json();
+
+            if (req.status < 200 || req.status >= 300) {
+                response.error = `${req.statusText} - ${response.data.error}`
+            }
         } catch (err: any) {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {
@@ -78,6 +82,10 @@ export class BywiseApiV1 {
                 body: JSON.stringify(parameters)
             });
             response.data = await req.json();
+
+            if (req.status < 200 || req.status >= 300) {
+                response.error = `${req.statusText} - ${response.data.error}`
+            }
         } catch (err: any) {
             response.error = `bywise-api error: ${err.message}`;
             if (err.response) {

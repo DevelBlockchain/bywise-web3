@@ -45,6 +45,9 @@ export class BywiseApiV2 {
             if (this.debug) {
                 console.log(`response`, response.data)
             }
+            if (req.status < 200 || req.status >= 300) {
+                response.error = `${req.statusText} - ${response.data.error}`
+            }
         } catch (err: any) {
             response.error = `${err.message}`;
             if (err.response) {
@@ -89,6 +92,10 @@ export class BywiseApiV2 {
 
             if (this.debug) {
                 console.log(`response`, response.data)
+            }
+
+            if (req.status < 200 || req.status >= 300) {
+                response.error = `Error ${req.statusText}: ${response.data.error}`
             }
         } catch (err: any) {
             response.error = `${err.message}`;
