@@ -14,12 +14,12 @@ export type NetworkConfigs = {
 };
 
 export class NetworkActions {
-    public readonly initialNodes: string[];
     public readonly api: BywiseApiV2;
     public readonly apiv1: BywiseApiV1;
     public readonly isClient: boolean;
     public readonly myHost: string;
     public readonly maxConnectedNodes: number;
+    public initialNodes: string[];
     public isConnected: boolean = false;
     public connectedNodes: BywiseNode[] = [];
 
@@ -98,18 +98,26 @@ export class NetworkActions {
         return newKnowHosts;
     }
 
+    private async tryConnectNode(host: string): Promise<BywiseNode | null> {
+        let myNode = undefined;
+        if (!this.isClient) {
+            myNode = await this.createConnection();
+        }
+        let handshake = await this.api.tryHandshake(host, myNode);
+        if (!handshake.error) {
+            handshake.data.host = host;
+            return handshake.data;
+        }
+        return null;
+    }
+
     private async tryConnecteKnowNodes(knowHosts: string[]) {
         for (let i = 0; i < knowHosts.length; i++) {
             const host = knowHosts[i];
 
-            let myNode = undefined;
-            if (!this.isClient) {
-                myNode = await this.createConnection();
-            }
-            let handshake = await this.api.tryHandshake(host, myNode);
-            if (!handshake.error) {
-                handshake.data.host = host;
-                this.connectedNodes.push(handshake.data);
+            const node = await this.tryConnectNode(host);
+            if (node) {
+                this.connectedNodes.push(node);
             }
             if (this.connectedNodes.length >= this.maxConnectedNodes) {
                 return;
@@ -117,7 +125,7 @@ export class NetworkActions {
         }
     }
 
-    tryConnection = async () => {
+    async tryConnection () {
         this.isConnected = false;
         let knowHosts: string[] = [];
         await this.populateKnowHosts(knowHosts);
@@ -131,6 +139,55 @@ export class NetworkActions {
             this.isConnected = true;
         }
         return this.connectedNodes.length;
+    }
+
+    async updateConnections(initialNodes?: string[]) {
+        if (initialNodes !== undefined) {
+            this.initialNodes = initialNodes;
+        }
+        const now = Math.floor(Date.now() / 1000);
+        const updatedNodes: BywiseNode[] = [];
+        for (let i = this.connectedNodes.length - 1; i >= 0; i--) {
+            const node = this.connectedNodes[i];
+            if (node.expire && node.expire < now) {
+                const updateNode = await this.tryConnectNode(node.host);
+                if (updateNode) {
+                    updatedNodes.push(node);
+                }
+            } else {
+                updatedNodes.push(node);
+            }
+        }
+        for (let i = 0; i < this.initialNodes.length; i++) {
+            const host = this.initialNodes[i];
+            let found = false;
+            for (let j = 0; j < updatedNodes.length && !found; j++) {
+                const node = updatedNodes[j];
+                if(node.host === host) {
+                    found = true;
+                }
+            }
+            if(!found && updatedNodes.length >= this.maxConnectedNodes) {
+                const newNode = await this.tryConnectNode(host);
+                if (newNode) {
+                    updatedNodes.push(newNode);
+                }
+            }
+        }
+        this.connectedNodes = updatedNodes;
+        this.isConnected = false;
+        if(this.initialNodes.length === 0) {
+            this.isConnected = true;
+        }
+        if(this.connectedNodes.length > 0) {
+            this.isConnected = true;
+        }
+        return this.isConnected;
+    }
+
+    disconnect() {
+        this.connectedNodes = [];
+        this.isConnected = false;
     }
 
     async testConnections() {
@@ -195,7 +252,7 @@ export class NetworkActions {
                 }
             }
         }
-        if(success) {
+        if (success) {
             return undefined;
         }
         return error;

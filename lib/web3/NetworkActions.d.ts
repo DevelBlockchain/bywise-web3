@@ -10,12 +10,12 @@ export type NetworkConfigs = {
     debug: boolean;
 };
 export declare class NetworkActions {
-    readonly initialNodes: string[];
     readonly api: BywiseApiV2;
     readonly apiv1: BywiseApiV1;
     readonly isClient: boolean;
     readonly myHost: string;
     readonly maxConnectedNodes: number;
+    initialNodes: string[];
     isConnected: boolean;
     connectedNodes: BywiseNode[];
     constructor(configs: NetworkConfigs);
@@ -28,8 +28,11 @@ export declare class NetworkActions {
     private populateKnowHosts;
     private excludeOfflineNodesAndUpdateKnowHosts;
     private removeConnectedNodes;
+    private tryConnectNode;
     private tryConnecteKnowNodes;
-    tryConnection: () => Promise<number>;
+    tryConnection(): Promise<number>;
+    updateConnections(initialNodes?: string[]): Promise<boolean>;
+    disconnect(): void;
     testConnections(): Promise<boolean>;
     addNode: (node: BywiseNode) => void;
     getRandomNode: (chain?: string) => BywiseNode;
