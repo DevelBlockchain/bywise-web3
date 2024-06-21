@@ -125,7 +125,7 @@ export class NetworkActions {
         }
     }
 
-    async tryConnection () {
+    async tryConnection() {
         this.isConnected = false;
         let knowHosts: string[] = [];
         await this.populateKnowHosts(knowHosts);
@@ -152,7 +152,7 @@ export class NetworkActions {
             if (node.expire && node.expire < now) {
                 const updateNode = await this.tryConnectNode(node.host);
                 if (updateNode) {
-                    updatedNodes.push(node);
+                    updatedNodes.push(updateNode);
                 }
             } else {
                 updatedNodes.push(node);
@@ -163,11 +163,11 @@ export class NetworkActions {
             let found = false;
             for (let j = 0; j < updatedNodes.length && !found; j++) {
                 const node = updatedNodes[j];
-                if(node.host === host) {
+                if (node.host === host) {
                     found = true;
                 }
             }
-            if(!found && updatedNodes.length >= this.maxConnectedNodes) {
+            if (!found && updatedNodes.length >= this.maxConnectedNodes) {
                 const newNode = await this.tryConnectNode(host);
                 if (newNode) {
                     updatedNodes.push(newNode);
@@ -175,13 +175,14 @@ export class NetworkActions {
             }
         }
         this.connectedNodes = updatedNodes;
-        this.isConnected = false;
-        if(this.initialNodes.length === 0) {
-            this.isConnected = true;
+        let isConnected = false;
+        if (this.initialNodes.length === 0) {
+            isConnected = true;
         }
-        if(this.connectedNodes.length > 0) {
-            this.isConnected = true;
+        if (this.connectedNodes.length > 0) {
+            isConnected = true;
         }
+        this.isConnected = isConnected;
         return this.isConnected;
     }
 
