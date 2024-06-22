@@ -167,7 +167,7 @@ export class NetworkActions {
                     found = true;
                 }
             }
-            if (!found && updatedNodes.length >= this.maxConnectedNodes) {
+            if (!found && updatedNodes.length < this.maxConnectedNodes) {
                 const newNode = await this.tryConnectNode(host);
                 if (newNode) {
                     updatedNodes.push(newNode);
