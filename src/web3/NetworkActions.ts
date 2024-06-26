@@ -1,4 +1,4 @@
-import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse, Network } from "../types";
+import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse } from "../types";
 const randomstring = require("randomstring");
 
 export type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>
@@ -22,6 +22,7 @@ export class NetworkActions {
     public initialNodes: string[];
     public isConnected: boolean = false;
     public connectedNodes: BywiseNode[] = [];
+    public knowHosts: string[] = [];
 
     constructor(configs: NetworkConfigs) {
         this.maxConnectedNodes = configs.maxConnectedNodes;
@@ -51,53 +52,6 @@ export class NetworkActions {
         this.connectedNodes = payload.connectedNodes;
     }
 
-    private async populateKnowHosts(knowHosts: string[]) {
-        this.initialNodes.forEach(host => {
-            if (!knowHosts.includes(host)) {
-                knowHosts.push(host);
-            }
-        })
-    }
-
-    private async excludeOfflineNodesAndUpdateKnowHosts(knowHosts: string[]) {
-        for (let i = this.connectedNodes.length - 1; i >= 0; i--) {
-            const node = this.connectedNodes[i];
-            let req = await this.api.tryToken(node);
-            if (req.error) {
-                this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
-            } else {
-                const nodes = req.data.nodes;
-                for (let j = 0; j < nodes.length; j++) {
-                    const knowNode = nodes[j];
-                    if (!knowHosts.includes(knowNode.host)) {
-                        knowHosts.push(knowNode.host);
-                    }
-                }
-            }
-        }
-    }
-
-    private async removeConnectedNodes(knowHosts: string[]) {
-        const newKnowHosts: string[] = [];
-        for (let i = knowHosts.length - 1; i >= 0; i--) {
-            const host = knowHosts[i];
-
-            let found = false;
-            if (host === this.myHost) {
-                found = true;
-            }
-            this.connectedNodes.forEach(n => {
-                if (n.host === host) {
-                    found = true;
-                }
-            })
-            if (!found) {
-                newKnowHosts.push(host);
-            }
-        }
-        return newKnowHosts;
-    }
-
     private async tryConnectNode(host: string): Promise<BywiseNode | null> {
         let myNode = undefined;
         if (!this.isClient) {
@@ -111,83 +65,91 @@ export class NetworkActions {
         return null;
     }
 
-    private async tryConnecteKnowNodes(knowHosts: string[]) {
-        for (let i = 0; i < knowHosts.length; i++) {
-            const host = knowHosts[i];
-
-            const node = await this.tryConnectNode(host);
-            if (node) {
-                this.connectedNodes.push(node);
-            }
-            if (this.connectedNodes.length >= this.maxConnectedNodes) {
-                return;
-            }
-        }
-    }
-
-    async tryConnection() {
-        this.isConnected = false;
-        let knowHosts: string[] = [];
-        await this.populateKnowHosts(knowHosts);
-        if (knowHosts.length === 0) {
-            this.isConnected = true;
-        }
-        await this.excludeOfflineNodesAndUpdateKnowHosts(knowHosts);
-        knowHosts = await this.removeConnectedNodes(knowHosts);
-        await this.tryConnecteKnowNodes(knowHosts);
-        if (this.connectedNodes.length > 0) {
-            this.isConnected = true;
-        }
-        return this.connectedNodes.length;
-    }
-
-    async updateConnections(initialNodes?: string[]) {
+    async connect(initialNodes?: string[]) {
         if (initialNodes !== undefined) {
             this.initialNodes = initialNodes;
         }
         const now = Math.floor(Date.now() / 1000);
-        const updatedNodes: BywiseNode[] = [];
+        let connectedNodes: BywiseNode[] = [];
         for (let i = this.connectedNodes.length - 1; i >= 0; i--) {
             const node = this.connectedNodes[i];
             if (node.expire && node.expire < now) {
                 const updateNode = await this.tryConnectNode(node.host);
                 if (updateNode) {
-                    updatedNodes.push(updateNode);
+                    connectedNodes.push(updateNode);
                 }
             } else {
-                updatedNodes.push(node);
+                connectedNodes.push(node);
             }
         }
         for (let i = 0; i < this.initialNodes.length; i++) {
             const host = this.initialNodes[i];
             let found = false;
-            for (let j = 0; j < updatedNodes.length && !found; j++) {
-                const node = updatedNodes[j];
+            for (let j = 0; j < connectedNodes.length && !found; j++) {
+                const node = connectedNodes[j];
                 if (node.host === host) {
                     found = true;
                 }
             }
-            if (!found && updatedNodes.length < this.maxConnectedNodes) {
+            if (!found && connectedNodes.length < this.maxConnectedNodes) {
                 const newNode = await this.tryConnectNode(host);
                 if (newNode) {
-                    updatedNodes.push(newNode);
+                    connectedNodes.push(newNode);
                 }
             }
         }
-        this.connectedNodes = updatedNodes;
+        const knowHosts: string[] = [];
+        for (let i = connectedNodes.length - 1; i >= 0; i--) {
+            const node = connectedNodes[i];
+            const req = await this.api.tryToken(node);
+            if (req.error) {
+                connectedNodes = connectedNodes.filter(n => n.host !== node.host);
+            } else {
+                if (!knowHosts.includes(node.host)) {
+                    knowHosts.push(node.host);
+                }
+                const nodes = req.data.nodes;
+                for (let j = 0; j < nodes.length; j++) {
+                    const knowNode = nodes[j];
+                    if (!knowHosts.includes(knowNode.host)) {
+                        knowHosts.push(knowNode.host);
+                    }
+                }
+            }
+        }
+        for (let i = 0; i < knowHosts.length; i++) {
+            const host = knowHosts[i];
+            let found = false;
+            for (let j = 0; j < connectedNodes.length && !found; j++) {
+                const node = connectedNodes[j];
+                if (node.host === host) {
+                    found = true;
+                }
+            }
+            if (!found && connectedNodes.length < this.maxConnectedNodes) {
+                const newNode = await this.tryConnectNode(host);
+                if (newNode) {
+                    connectedNodes.push(newNode);
+                }
+            }
+        }
+
         let isConnected = false;
-        if (this.initialNodes.length === 0) {
+        if (connectedNodes.length === 0) {
             isConnected = true;
         }
-        if (this.connectedNodes.length > 0) {
+        if (connectedNodes.length > 0) {
             isConnected = true;
         }
+        this.connectedNodes = connectedNodes;
+        this.knowHosts = knowHosts;
         this.isConnected = isConnected;
         return this.isConnected;
     }
 
     disconnect() {
         this.connectedNodes = [];
+        this.knowHosts = [];
         this.isConnected = false;
     }
 

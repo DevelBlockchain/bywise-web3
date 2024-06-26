@@ -18,6 +18,7 @@ export declare class NetworkActions {
     initialNodes: string[];
     isConnected: boolean;
     connectedNodes: BywiseNode[];
+    knowHosts: string[];
     constructor(configs: NetworkConfigs);
     private createConnection;
     exportConnections: () => {
@@ -25,13 +26,8 @@ export declare class NetworkActions {
         connectedNodes: BywiseNode[];
     };
     importConnections: (payload: any) => Promise<void>;
-    private populateKnowHosts;
-    private excludeOfflineNodesAndUpdateKnowHosts;
-    private removeConnectedNodes;
     private tryConnectNode;
-    private tryConnecteKnowNodes;
-    tryConnection(): Promise<number>;
-    updateConnections(initialNodes?: string[]): Promise<boolean>;
+    connect(initialNodes?: string[]): Promise<boolean>;
     disconnect(): void;
     testConnections(): Promise<boolean>;
     addNode: (node: BywiseNode) => void;
