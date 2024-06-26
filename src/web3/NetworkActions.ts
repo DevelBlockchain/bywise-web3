@@ -56,6 +56,9 @@ export class NetworkActions {
         let myNode = undefined;
         if (!this.isClient) {
             myNode = await this.createConnection();
+            if (myNode.host === host) {
+                return null;
+            }
         }
         let handshake = await this.api.tryHandshake(host, myNode);
         if (!handshake.error) {
