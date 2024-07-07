@@ -24,7 +24,7 @@ export enum TxType {
 export class Tx implements BywiseTransaction {
     version: string;
     chain: string;
-    validator?: string;
+    validator?: string[];
     from: string[];
     to: string[];
     amount: string[];
@@ -34,7 +34,8 @@ export class Tx implements BywiseTransaction {
     data: any;
     created: number;
     hash: string;
-    validatorSign?: string;
+    validatorSign?: string[];
+    output?: TransactionOutput;
     sign: string[];
 
     constructor(tx?: Partial<Tx>) {
@@ -61,7 +62,11 @@ export class Tx implements BywiseTransaction {
             bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
         }
         if (this.validator) {
-            bytes += Buffer.from(this.validator, 'utf-8').toString('hex');
+            if (this.validator) {
+                this.validator.forEach(addr => {
+                    bytes += Buffer.from(addr, 'utf-8').toString('hex');;
+                })
+            }
         }
         this.from.forEach(from => {
             bytes += Buffer.from(from, 'utf-8').toString('hex');
@@ -80,6 +85,23 @@ export class Tx implements BywiseTransaction {
                 bytes += Buffer.from(key, 'utf-8').toString('hex');;
             })
         }
+        if (this.output) {
+            bytes += BywiseHelper.numberToHex(this.output.cost);
+            bytes += Buffer.from(this.output.feeUsed, 'utf-8').toString('hex');
+            bytes += Buffer.from(this.output.debit, 'utf-8').toString('hex');
+            if (this.output.output) {
+                bytes += Buffer.from(BywiseHelper.jsonToString(this.output.output), 'utf-8').toString('hex');
+            }
+            this.output.logs.forEach(log => {
+                bytes += Buffer.from(log, 'utf-8').toString('hex');;
+            })
+            if (this.output.events) {
+                bytes += Buffer.from(BywiseHelper.jsonToString(this.output.events), 'utf-8').toString('hex');
+            }
+            if (this.output.changes) {
+                bytes += Buffer.from(BywiseHelper.jsonToString(this.output.changes), 'utf-8').toString('hex');
+            }
+        }
         bytes += BywiseHelper.numberToHex(this.created);
         if (this.version == '1') {
             bytes = BywiseHelper.makeHashV1(bytes);
@@ -95,7 +117,11 @@ export class Tx implements BywiseTransaction {
             if (this.chain.length === 0) throw new Error('invalid transaction chain cant be empty');
             if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         }
-        if (this.validator && !BywiseHelper.isValidAddress(this.validator)) throw new Error('invalid transaction validator address ' + this.validator);
+        if (this.validator) {
+            this.validator.forEach(addr => {
+                if (!BywiseHelper.isValidAddress(addr)) throw new Error('invalid transaction validator address ' + addr);
+            })
+        }
         if (!BywiseHelper.isStringArray(this.from)) throw new Error('invalid array');
         if (this.from.length === 0) throw new Error('invalid transaction sender cant be empty');
         if (this.from.length > 100) throw new Error('maximum number of senders is 100 signatures');
@@ -129,7 +155,12 @@ export class Tx implements BywiseTransaction {
         if (this.hash !== this.toHash()) throw new Error('corrupt transaction');
         if (this.validator) {
             if (!this.validatorSign) throw new Error('validator sign cant be empty');
-            if (!BywiseHelper.isValidSign(this.validatorSign, this.validator, this.hash)) throw new Error('invalid validator signature');
+            if (this.validator.length !== this.validatorSign.length) throw new Error('invalid validator signature');
+            for (let i = 0; i < this.sign.length; i++) {
+                const sign = this.validatorSign[i];
+                const addr = this.validator[i];
+                if (!BywiseHelper.isValidSign(sign, addr, this.hash)) throw new Error('invalid validator signature');
+            }
         } else {
             if (this.validatorSign) throw new Error('validator address cant be empty');
         }
@@ -139,10 +170,44 @@ export class Tx implements BywiseTransaction {
         for (let i = 0; i < this.sign.length; i++) {
             const sign = this.sign[i];
             const fromAddress = this.from[i];
-            
+
             if (!BywiseHelper.isValidSign(sign, fromAddress, this.hash)) throw new Error('invalid signature');
         }
     }
+}
+
+export type TransactionEventEntry = {
+    key: string;
+    value: string;
+}
+
+export type TransactionEvent = {
+    contractAddress: string;
+    eventName: string;
+    entries: TransactionEventEntry[];
+    hash: string;
+}
+
+export type EnvironmentChanges = {
+    keys: string[];
+    values: (string | null)[];
+}
+
+export type TransactionChanges = {
+    get: string[];
+    walletAddress: string[];
+    walletAmount: string[];
+    envOut: EnvironmentChanges
+}
+
+export type TransactionOutput = {
+    cost: number;
+    feeUsed: string;
+    debit: string;
+    logs: string[];
+    output: any;
+    events: TransactionEvent[];
+    changes: TransactionChanges;
 }
 
 export type SimulateTx = {
