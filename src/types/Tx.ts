@@ -190,15 +190,16 @@ export type TransactionChanges = {
 }
 
 export type TxOutput = {
-    cost?: number;
-    size?: number;
+    error?: string;
+    stack?: string;
+    output?: any;
+    cost: number;
+    size: number;
     feeUsed: string;
     fee: string;
     fromSlice: string;
-    logs?: string[];
-    error?: string;
+    logs: string[];
     debit: string;
-    output?: any;
     events: TransactionEvent[];
     changes: TransactionChanges;
 }
