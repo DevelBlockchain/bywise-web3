@@ -32,7 +32,7 @@ export declare class Tx implements BywiseTransaction {
     created: number;
     hash: string;
     validatorSign?: string[];
-    output?: TransactionOutput;
+    output?: TxOutput;
     sign: string[];
     constructor(tx?: Partial<Tx>);
     toHash(): string;
@@ -58,12 +58,16 @@ export type TransactionChanges = {
     walletAmount: string[];
     envOut: EnvironmentChanges;
 };
-export type TransactionOutput = {
-    cost: number;
+export type TxOutput = {
+    cost?: number;
+    size?: number;
     feeUsed: string;
+    fee: string;
+    fromSlice: string;
+    logs?: string[];
+    error?: string;
     debit: string;
-    logs: string[];
-    output: any;
+    output?: any;
     events: TransactionEvent[];
     changes: TransactionChanges;
 };
@@ -91,18 +95,9 @@ export type OutputSimulateContract = {
     output: any;
     env: any;
 };
-export type TxOutput = {
-    cost?: number;
-    size?: number;
-    feeUsed: string;
-    fee: string;
-    logs?: string[];
-    error?: string;
-    output?: any;
-};
 export type PublishedTx = {
     version: string;
-    validator?: string;
+    validator?: string[];
     from: string[];
     to: string[];
     amount: string[];
@@ -112,7 +107,7 @@ export type PublishedTx = {
     data: any;
     created: number;
     hash: string;
-    validatorSign?: string;
+    validatorSign?: string[];
     sign: string[];
     status: string;
     output: TxOutput;

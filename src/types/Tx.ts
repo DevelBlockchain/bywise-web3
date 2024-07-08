@@ -35,7 +35,7 @@ export class Tx implements BywiseTransaction {
     created: number;
     hash: string;
     validatorSign?: string[];
-    output?: TransactionOutput;
+    output?: TxOutput;
     sign: string[];
 
     constructor(tx?: Partial<Tx>) {
@@ -49,6 +49,7 @@ export class Tx implements BywiseTransaction {
         this.type = tx?.type ?? TxType.TX_NONE;
         this.foreignKeys = tx?.foreignKeys;
         this.data = tx?.data ?? {};
+        this.output = tx?.output;
         this.created = tx?.created ?? 0;
         this.hash = tx?.hash ?? '';
         this.validatorSign = tx?.validatorSign;
@@ -86,21 +87,7 @@ export class Tx implements BywiseTransaction {
             })
         }
         if (this.output) {
-            bytes += BywiseHelper.numberToHex(this.output.cost);
-            bytes += Buffer.from(this.output.feeUsed, 'utf-8').toString('hex');
-            bytes += Buffer.from(this.output.debit, 'utf-8').toString('hex');
-            if (this.output.output) {
-                bytes += Buffer.from(BywiseHelper.jsonToString(this.output.output), 'utf-8').toString('hex');
-            }
-            this.output.logs.forEach(log => {
-                bytes += Buffer.from(log, 'utf-8').toString('hex');;
-            })
-            if (this.output.events) {
-                bytes += Buffer.from(BywiseHelper.jsonToString(this.output.events), 'utf-8').toString('hex');
-            }
-            if (this.output.changes) {
-                bytes += Buffer.from(BywiseHelper.jsonToString(this.output.changes), 'utf-8').toString('hex');
-            }
+            bytes += Buffer.from(BywiseHelper.jsonToString(this.output), 'utf-8').toString('hex');
         }
         bytes += BywiseHelper.numberToHex(this.created);
         if (this.version == '1') {
@@ -149,7 +136,7 @@ export class Tx implements BywiseTransaction {
                 if (!BywiseHelper.isValidAlfaNum(key)) throw new Error('invalid foreignKey ' + key);
             })
         }
-        if (BywiseHelper.jsonToString(this.data).length > 1048576) throw new Error('data too large ' + BywiseHelper.jsonToString(this.data).length);
+        if (BywiseHelper.jsonToString(this.data).length > 1048576) throw new Error('data too large');
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
         if (!BywiseHelper.isValidHash(this.hash)) throw new Error('invalid transaction hash ' + this.hash);
         if (this.hash !== this.toHash()) throw new Error('corrupt transaction');
@@ -161,6 +148,8 @@ export class Tx implements BywiseTransaction {
                 const addr = this.validator[i];
                 if (!BywiseHelper.isValidSign(sign, addr, this.hash)) throw new Error('invalid validator signature');
             }
+            if(!this.output) throw new Error('invalid validator output');
+            if (BywiseHelper.jsonToString(this.output).length > 1048576) throw new Error('invalid validator output');
         } else {
             if (this.validatorSign) throw new Error('validator address cant be empty');
         }
@@ -200,12 +189,16 @@ export type TransactionChanges = {
     envOut: EnvironmentChanges
 }
 
-export type TransactionOutput = {
-    cost: number;
+export type TxOutput = {
+    cost?: number;
+    size?: number;
     feeUsed: string;
+    fee: string;
+    fromSlice: string;
+    logs?: string[];
+    error?: string;
     debit: string;
-    logs: string[];
-    output: any;
+    output?: any;
     events: TransactionEvent[];
     changes: TransactionChanges;
 }
@@ -237,19 +230,9 @@ export type OutputSimulateContract = {
     env: any;
 }
 
-export type TxOutput = {
-    cost?: number;
-    size?: number;
-    feeUsed: string;
-    fee: string;
-    logs?: string[];
-    error?: string;
-    output?: any;
-}
-
 export type PublishedTx = {
     version: string;
-    validator?: string;
+    validator?: string[];
     from: string[];
     to: string[];
     amount: string[];
@@ -259,7 +242,7 @@ export type PublishedTx = {
     data: any;
     created: number;
     hash: string;
-    validatorSign?: string;
+    validatorSign?: string[];
     sign: string[];
 
     status: string;

@@ -1,4 +1,4 @@
-import { OutputSimulateContract, PublishedTx, SimulateContract, SimulateTx, Tx, TxBlockchainInfo, TxOutput, TxType } from "../types";
+import { PublishedTx, SimulateTx, Tx, TxOutput, TxType } from "../types";
 import { BywiseHelper, Wallet } from "../utils";
 import { Web3 } from "./Web3";
 
