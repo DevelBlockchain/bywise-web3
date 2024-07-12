@@ -35,7 +35,7 @@ export class Tx implements BywiseTransaction {
     created: number;
     hash: string;
     validatorSign?: string[];
-    output?: TxOutput;
+    output: TxOutput;
     sign: string[];
 
     constructor(tx?: Partial<Tx>) {
@@ -49,7 +49,23 @@ export class Tx implements BywiseTransaction {
         this.type = tx?.type ?? TxType.TX_NONE;
         this.foreignKeys = tx?.foreignKeys;
         this.data = tx?.data ?? {};
-        this.output = tx?.output;
+        this.output = tx?.output ?? {
+            feeUsed: '0',
+            cost: 0,
+            size: 0,
+            ctx: '0000000000000000000000000000000000000000000000000000000000000000',
+            debit: '0',
+            logs: [],
+            events: [],
+            get: [],
+            walletAddress: [],
+            walletAmount: [],
+            envs: {
+                keys: [],
+                values: []
+            },
+            output: ''
+        };
         this.created = tx?.created ?? 0;
         this.hash = tx?.hash ?? '';
         this.validatorSign = tx?.validatorSign;
@@ -99,15 +115,13 @@ export class Tx implements BywiseTransaction {
     }
 
     isValid(): void {
-        if (this.version !== '1' && this.version !== '2') throw new Error('invalid version ' + this.version);
-        if (this.version == '2') {
-            if (this.chain.length === 0) throw new Error('invalid transaction chain cant be empty');
-            if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
-        }
+        if (this.version !== '3') throw new Error('invalid version ' + this.version);
+        if (this.chain.length === 0) throw new Error('invalid transaction chain cant be empty');
+        if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         if (this.validator) {
             this.validator.forEach(addr => {
                 if (!BywiseHelper.isValidAddress(addr)) throw new Error('invalid transaction validator address ' + addr);
-            })
+            });
         }
         if (!BywiseHelper.isStringArray(this.from)) throw new Error('invalid array');
         if (this.from.length === 0) throw new Error('invalid transaction sender cant be empty');
@@ -140,6 +154,10 @@ export class Tx implements BywiseTransaction {
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
         if (!BywiseHelper.isValidHash(this.hash)) throw new Error('invalid transaction hash ' + this.hash);
         if (this.hash !== this.toHash()) throw new Error('corrupt transaction');
+
+        if (!this.output) throw new Error('invalid validator output');
+        if (BywiseHelper.jsonToString(this.output).length > 1048576) throw new Error('invalid validator output');
+
         if (this.validator) {
             if (!this.validatorSign) throw new Error('validator sign cant be empty');
             if (this.validator.length !== this.validatorSign.length) throw new Error('invalid validator signature');
@@ -148,8 +166,6 @@ export class Tx implements BywiseTransaction {
                 const addr = this.validator[i];
                 if (!BywiseHelper.isValidSign(sign, addr, this.hash)) throw new Error('invalid validator signature');
             }
-            if(!this.output) throw new Error('invalid validator output');
-            if (BywiseHelper.jsonToString(this.output).length > 1048576) throw new Error('invalid validator output');
         } else {
             if (this.validatorSign) throw new Error('validator address cant be empty');
         }
@@ -192,16 +208,18 @@ export type TransactionChanges = {
 export type TxOutput = {
     error?: string;
     stack?: string;
-    output?: any;
+    output: any;
     cost: number;
     size: number;
     feeUsed: string;
-    fee: string;
-    fromSlice: string;
+    ctx: string;
     logs: string[];
     debit: string;
     events: TransactionEvent[];
-    changes: TransactionChanges;
+    get: string[];
+    walletAddress: string[];
+    walletAmount: string[];
+    envs: EnvironmentChanges;
 }
 
 export type SimulateTx = {
