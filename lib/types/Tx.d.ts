@@ -56,7 +56,7 @@ export type TransactionChanges = {
     get: string[];
     walletAddress: string[];
     walletAmount: string[];
-    envOut: EnvironmentChanges;
+    envs: EnvironmentChanges;
 };
 export type TxOutput = {
     error?: string;
