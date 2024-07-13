@@ -99,9 +99,16 @@ export class BywiseHelper {
     static isValidAmount = (amount: string) => {
         return /^(0|[1-9][0-9]{0,48})$/.test(amount);
     }
+    static isValidSignedAmount = (amount: string) => {
+        return /^(0|[\-]{0,1}[1-9][0-9]{0,48})$/.test(amount);
+    }
 
     static isValidAlfaNum = (value: string) => {
         return /^[a-zA-Z0-9_]{0,64}$/.test(value);
+    }
+    
+    static isValidAlfaNumSlash = (value: string) => {
+        return /^[a-zA-Z0-9_\-]{1,300}$/.test(value);
     }
 
     static isValidHash = (value: string) => {

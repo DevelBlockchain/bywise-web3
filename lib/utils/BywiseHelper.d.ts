@@ -13,7 +13,9 @@ export declare class BywiseHelper {
     static isContractAddress: (address: string) => boolean;
     static isStringArray: (arr: any) => boolean;
     static isValidAmount: (amount: string) => boolean;
+    static isValidSignedAmount: (amount: string) => boolean;
     static isValidAlfaNum: (value: string) => boolean;
+    static isValidAlfaNumSlash: (value: string) => boolean;
     static isValidHash: (value: string) => boolean;
     static isValidInteger: (height: number) => boolean;
     static isValidDate: (date: number) => boolean;
