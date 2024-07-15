@@ -69,14 +69,17 @@ export class BywiseApiV2_WS {
     }
 
     private async get(host: string, path: string, token: string | undefined, parameters: any = {}): Promise<BywiseResponse<any>> {
-        const req = {
+        const req: WSRequest = {
             id: randomstring.generate(40),
             path: path,
             method: "GET",
             token,
-            query: parameters,
+            query: {},
             body: {},
         }
+        Object.entries(parameters).map(([key, value]) => {
+            req.query[key] = `${value}`;
+        });
 
         const response: BywiseResponse<any> = {
             data: {}
