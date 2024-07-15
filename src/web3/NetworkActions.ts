@@ -1,5 +1,5 @@
 import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse } from "../types";
-const randomstring = require("randomstring");
+import { BywiseApiV2_WS } from "../types/BywiseApiV2_WS";
 
 export type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>
 export type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>
@@ -14,8 +14,9 @@ export type NetworkConfigs = {
 };
 
 export class NetworkActions {
-    public readonly api: BywiseApiV2;
-    public readonly apiv1: BywiseApiV1;
+    private readonly apiWS: BywiseApiV2_WS;
+    private readonly api: BywiseApiV2;
+    private readonly apiv1: BywiseApiV1;
     public readonly isClient: boolean;
     public readonly myHost: string;
     public readonly maxConnectedNodes: number;
@@ -28,6 +29,7 @@ export class NetworkActions {
         this.maxConnectedNodes = configs.maxConnectedNodes;
         this.apiv1 = new BywiseApiV1(configs.debug);
         this.api = new BywiseApiV2(configs.debug);
+        this.apiWS = new BywiseApiV2_WS(configs.debug);
         this.initialNodes = configs.initialNodes;
         this.myHost = configs.myHost;
         this.isClient = configs.isClient;
@@ -52,7 +54,16 @@ export class NetworkActions {
         this.connectedNodes = payload.connectedNodes;
     }
 
+    getAPI(node: BywiseNode) {
+        if(node.host.startsWith("ws")) {
+            return this.apiWS;
+        } else {
+            return this.api;
+        }
+    }
+
     private async tryConnectNode(host: string): Promise<BywiseNode | null> {
+        console.log("tryConnectNode")
         let myNode = undefined;
         if (!this.isClient) {
             myNode = await this.createConnection();
@@ -60,7 +71,12 @@ export class NetworkActions {
                 return null;
             }
         }
-        let handshake = await this.api.tryHandshake(host, myNode);
+        let handshake;
+        if(host.startsWith("ws")) {
+            handshake = await this.apiWS.tryHandshake(host, myNode);
+        } else {
+            handshake = await this.api.tryHandshake(host, myNode);
+        }
         if (!handshake.error) {
             handshake.data.host = host;
             return handshake.data;
@@ -104,7 +120,7 @@ export class NetworkActions {
         const knowHosts: string[] = [];
         for (let i = connectedNodes.length - 1; i >= 0; i--) {
             const node = connectedNodes[i];
-            const req = await this.api.tryToken(node);
+            const req =  await this.getAPI(node).tryToken(node);
             if (req.error) {
                 connectedNodes = connectedNodes.filter(n => n.host !== node.host);
             } else {
@@ -160,7 +176,7 @@ export class NetworkActions {
         let success = this.initialNodes.length === 0;
         for (let i = this.connectedNodes.length - 1; i >= 0 && !success; i--) {
             const node = this.connectedNodes[i];
-            let req = await this.api.tryToken(node);
+            const req =  await this.getAPI(node).tryToken(node);
             if (req.error) {
                 this.connectedNodes = this.connectedNodes.filter(n => n.host !== node.host);
             } else {

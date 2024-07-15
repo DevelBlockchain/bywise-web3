@@ -18,7 +18,7 @@ export class WalletsActions {
 
     getWalletInfo = async (address: string, chain: string): Promise<WalletInfo | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.getWalletInfo(node, address, chain);
+            let req = await this.web3.network.getAPI(node).getWalletInfo(node, address, chain);
             if (!req.error) {
                 return req.data;
             }

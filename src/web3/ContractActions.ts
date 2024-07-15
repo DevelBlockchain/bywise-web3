@@ -208,7 +208,8 @@ export class ContractActions {
             data: [{ method, inputs }],
             foreignKeys: [],
         };
-        let simulate = await this.web3.network.api.getFeeTransaction(this.web3.network.getRandomNode(), simulateTx);
+        const node = this.web3.network.getRandomNode();
+        let simulate = await this.web3.network.getAPI(node).getFeeTransaction(node, simulateTx);
         if (simulate.error) {
             throw new Error(`Internal error - details: ${simulate.error}`)
         };
@@ -219,7 +220,8 @@ export class ContractActions {
     }
 
     simulateContract = async (sc: SimulateContract): Promise<OutputSimulateContract> => {
-        let simulate = await this.web3.network.api.trySimulate(this.web3.network.getRandomNode(), sc);
+        const node = this.web3.network.getRandomNode();
+        let simulate = await this.web3.network.getAPI(node).trySimulate(node, sc);
         if (simulate.error) {
             throw new Error(`Can't simulate transaction - details: ${simulate.data.error}`)
         };
@@ -228,7 +230,7 @@ export class ContractActions {
 
     getContractByAddress = async (chain: string, address: string): Promise<TxOutput | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.getContractByAddress(node, chain, address);
+            let req = await this.web3.network.getAPI(node).getContractByAddress(node, chain, address);
             if (!req.error) {
                 return req.data;
             }
@@ -237,7 +239,7 @@ export class ContractActions {
 
     getContractEventByAddress = async (chain: string, address: string, event: string, byKey?: { key: string, value: string }): Promise<TxOutput | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.api.getContractEventByAddress(node, chain, address, event, byKey);
+            let req = await this.web3.network.getAPI(node).getContractEventByAddress(node, chain, address, event, byKey);
             if (!req.error) {
                 return req.data;
             }
