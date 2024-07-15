@@ -106,9 +106,7 @@ export class Tx implements BywiseTransaction {
     toHash(): string {
         let bytes = '';
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
-        if (this.version == '2') {
-            bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
-        }
+        bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
         if (this.validator) {
             if (this.validator) {
                 this.validator.forEach(addr => {
@@ -135,11 +133,7 @@ export class Tx implements BywiseTransaction {
         }
         bytes += Buffer.from(BywiseHelper.jsonToString(this.output), 'utf-8').toString('hex');
         bytes += BywiseHelper.numberToHex(this.created);
-        if (this.version == '1') {
-            bytes = BywiseHelper.makeHashV1(bytes);
-        } else {
-            bytes = BywiseHelper.makeHash(bytes);
-        }
+        bytes = BywiseHelper.makeHash(bytes);
         return bytes;
     }
 

@@ -58,9 +58,7 @@ export class Slice implements BywiseTransaction {
         bytes += Buffer.from(this.from, 'utf-8').toString('hex');
         bytes += BywiseHelper.numberToHex(this.created);
         bytes += Buffer.from(this.end ? 'true' : 'false', 'utf-8').toString('hex');
-        if (this.version == '3') {
-            bytes += this.lastHash;
-        }
+        bytes += this.lastHash;
         bytes += this.getMerkleRoot();
         bytes = BywiseHelper.makeHash(bytes);
         return bytes;
@@ -80,14 +78,10 @@ export class Slice implements BywiseTransaction {
             let txHash = this.transactions[i];
             if (!BywiseHelper.isValidHash(txHash)) throw new Error(`invalid tx hash ${i} - ${txHash}`);
         }
-        if (this.version !== '1' && this.version !== '2' && this.version !== '3') throw new Error('invalid version');
-        if (this.version == '2' || this.version == '3') {
-            if (this.chain.length === 0) throw new Error('invalid slice chain cant be empty');
-            if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
-            if (this.version == '3') {
-                if (!BywiseHelper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);
-            }
-        }
+        if (this.version !== '3') throw new Error('invalid version');
+        if (this.chain.length === 0) throw new Error('invalid slice chain cant be empty');
+        if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
+        if (!BywiseHelper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid slice from address ' + this.from);
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
         if (this.end !== true && this.end !== false) throw new Error('invalid slice end flag');

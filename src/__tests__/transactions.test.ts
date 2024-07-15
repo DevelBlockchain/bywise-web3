@@ -4,7 +4,7 @@ import { Wallet } from '../utils';
 const INVALID_ADDRESS = "BWS1MUf3fE542466114436c184001936CD72D3baeEA06c366"
 
 test('Test transaction - v2', async () => {
-    const jsonTX = { "version": "2", "chain": "testnet", "from": ["BWS1MUf3fE542466114436c184ad1936CD72D3baeEA06c366"], "to": ["BWS1MUf3fE542466114436c184ad1936CD72D3baeEA06c366"], "amount": ["0"], "fee": "0.102", "type": "contract-exe", "foreignKeys": [], "data": {}, "created": 1714822329, "hash": "acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65", "sign": ["0x0bb201b93a6f53e073e7392f368f86496be99ce9031d8697086fe6d70cf365971906fcce8a20071e0d5e6968ef5a672225a7c552a562100f43aa175ec9ae61581c"] }
+    const jsonTX = {"version":"3","chain":"testnet","from":["BWS1MU44044509189ba478B110c4a5aE3691F9aADe298D1fd"],"to":["BWS1MU44044509189ba478B110c4a5aE3691F9aADe298D1fd"],"amount":["30"],"fee":"2","type":"contract-exe-encrypt","foreignKeys":["acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65"],"data":[{"method":"transfer","inputs":["BWS1MU44044509189ba478B110c4a5aE3691F9aADe298D1fd","100"]}],"output":{"feeUsed":"0","cost":0,"size":0,"ctx":"0000000000000000000000000000000000000000000000000000000000000000","debit":"0","logs":[],"events":[],"get":[],"walletAddress":[],"walletAmount":[],"envs":{"keys":[],"values":[]},"output":""},"created":1721064184,"hash":"1a9bb6ae69e49ff447e6ea9470c591642f7df5a2257d4dbb84cb9332b0471d26","sign":["0x28f255c8d4810bdcb71d741fe86864d759d6ee14256b61f523e9ae7103b7d502168264ba095d201d186730c08f587914d359e5736582a8bf387a254433e604841c"]}
     const tx = new Tx(jsonTX);
     await expect(() => {
         tx.isValid();
@@ -15,7 +15,7 @@ test('Test version - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -36,21 +36,14 @@ test('Test version - v2', async () => {
     tx.sign = [await w1.signHash(tx.hash)];
     await expect(() => {
         tx.isValid();
-    }).not.toThrow();
-
-    tx.version = '2';
-    tx.hash = tx.toHash();
-    tx.sign = [await w1.signHash(tx.hash)];
-    await expect(() => {
-        tx.isValid();
-    }).not.toThrow();
+    }).toThrow();
 
     tx.version = '3';
     tx.hash = tx.toHash();
     tx.sign = [await w1.signHash(tx.hash)];
     await expect(() => {
         tx.isValid();
-    }).toThrow();
+    }).not.toThrow();
 
     tx.version = '-1';
     tx.hash = tx.toHash();
@@ -64,7 +57,7 @@ test('Test chain - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -113,7 +106,7 @@ test('Test from - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -156,7 +149,7 @@ test('Test to - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -199,7 +192,7 @@ test('Test amount - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -263,13 +256,6 @@ test('Test amount - v2', async () => {
     tx.sign = [await w1.signHash(tx.hash)];
     await expect(() => {
         tx.isValid();
-    }).not.toThrow();
-
-    tx.amount = ['10.0000000000000000000000000000000002'];
-    tx.hash = tx.toHash();
-    tx.sign = [await w1.signHash(tx.hash)];
-    await expect(() => {
-        tx.isValid();
     }).toThrow();
 
     tx.to = [w1.address, w1.address];
@@ -301,7 +287,7 @@ test('Test fee - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -322,6 +308,13 @@ test('Test fee - v2', async () => {
     tx.sign = [await w1.signHash(tx.hash)];
     await expect(() => {
         tx.isValid();
+    }).toThrow();
+
+    tx.fee = '20334';
+    tx.hash = tx.toHash();
+    tx.sign = [await w1.signHash(tx.hash)];
+    await expect(() => {
+        tx.isValid();
     }).not.toThrow();
 
     tx.fee = '';
@@ -338,7 +331,7 @@ test('Test fee - v2', async () => {
         tx.isValid();
     }).toThrow();
 
-    tx.fee = '100000000000000000000000000000000000000';
+    tx.fee = '100000000000000000000000000000000000000000000000000000000000000000';
     tx.hash = tx.toHash();
     tx.sign = [await w1.signHash(tx.hash)];
     await expect(() => {
@@ -357,7 +350,7 @@ test('Test type - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -392,7 +385,7 @@ test('Test data - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -503,7 +496,7 @@ test('Test foreignKeys - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -560,7 +553,7 @@ test('Test created - v2', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w1.address];
@@ -604,7 +597,7 @@ test('Test hash - v2', async () => {
     const w2 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w2.address];
@@ -619,12 +612,6 @@ test('Test hash - v2', async () => {
     await expect(() => {
         tx.isValid();
     }).not.toThrow();
-
-    await expect(() => {
-        const editedTX = new Tx(tx);
-        editedTX.version = '1';
-        editedTX.isValid();
-    }).toThrow(MESSAGE_ERROR);
 
     await expect(() => {
         const editedTX = new Tx(tx);
@@ -687,7 +674,7 @@ test('Test sign - v2', async () => {
     const w2 = new Wallet();
 
     const tx = new Tx();
-    tx.version = '2';
+    tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
     tx.to = [w2.address];
