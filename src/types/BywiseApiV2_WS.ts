@@ -50,6 +50,9 @@ export class BywiseApiV2_WS {
             const res: WSResponse = JSON.parse(data.toString());
             this.requests.set(res.id, res);
         });
+        client.on('close', () => {
+            this.connections.delete(host);
+        })
         client.on('error', data => {
             error = true;
         })
@@ -169,6 +172,17 @@ export class BywiseApiV2_WS {
             }
         }
         return response;
+    }
+
+    disconnect() {
+        for (let [key, client] of this.connections) {
+            try {
+                client.close();
+            } catch (err) {
+            }
+        }
+        this.connections = new Map();
+        this.requests = new Map();
     }
 
     publishNewBlock(node: BywiseNode, block: Block): Promise<BywiseResponse<void>> {

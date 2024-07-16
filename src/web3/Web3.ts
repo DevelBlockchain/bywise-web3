@@ -5,6 +5,7 @@ import { NetworkActions, NetworkConfigs } from "./NetworkActions";
 import { SlicesActions } from "./SlicesActions";
 import { TransactionsActions } from "./TransactionsActions";
 import { ContractActions } from "./ContractActions";
+import { BywiseApiV2_WS } from "../types/BywiseApiV2_WS";
 
 
 const defaultNetwork: { mainnet: Network, testnet: Network } = {
@@ -36,8 +37,15 @@ export class Web3 {
     private readonly debug: boolean = false;
 
     static async tryToken(node: BywiseNode) {
-        const api = new BywiseApiV2();
-        return await api.tryToken(node);
+        if(node.host.startsWith("ws")) {
+            const apiWS = new BywiseApiV2_WS();
+            const req = await apiWS.tryToken(node);
+            apiWS.disconnect();
+            return req;
+        } else {
+            const api = new BywiseApiV2();
+            return await api.tryToken(node);
+        }
     }
 
     constructor(configs?: { initialNodes?: string[], maxConnectedNodes?: number, myHost?: string, createConnection?: () => Promise<BywiseNode>, getChains?: () => Promise<string[]>, debug?: boolean }) {

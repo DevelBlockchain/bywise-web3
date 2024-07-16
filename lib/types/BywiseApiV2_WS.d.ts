@@ -26,6 +26,7 @@ export declare class BywiseApiV2_WS {
     private getSocket;
     private get;
     private post;
+    disconnect(): void;
     publishNewBlock(node: BywiseNode, block: Block): Promise<BywiseResponse<void>>;
     getBlocks(node: BywiseNode, chain: string, parameters?: {
         status?: string;

@@ -63,7 +63,6 @@ export class NetworkActions {
     }
 
     private async tryConnectNode(host: string): Promise<BywiseNode | null> {
-        console.log("tryConnectNode")
         let myNode = undefined;
         if (!this.isClient) {
             myNode = await this.createConnection();
@@ -167,6 +166,7 @@ export class NetworkActions {
     }
 
     disconnect() {
+        this.apiWS.disconnect();
         this.connectedNodes = [];
         this.knowHosts = [];
         this.isConnected = false;
