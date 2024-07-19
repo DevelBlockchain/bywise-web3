@@ -215,7 +215,7 @@ export class TransactionsActions {
         }
         tx.foreignKeys = foreignKeys ? foreignKeys : [];
         tx.created = info.data.timestamp;
-        tx.fee = (await this.estimateFee(tx)).feeUsed;
+        tx.output = (await this.estimateFee(tx));
         tx.hash = tx.toHash();
         tx.sign = [await wallet.signHash(tx.hash)];
         return tx;

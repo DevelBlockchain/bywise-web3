@@ -46,7 +46,7 @@ export class Block implements BywiseTransaction {
         bytes += BywiseHelper.numberToHex(this.height);
         bytes += BywiseHelper.numberToHex(this.transactionsCount);
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
-        if(this.version == '2') {
+        if (this.version == '2') {
             bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
         }
         bytes += Buffer.from(this.from, 'utf-8').toString('hex');
@@ -65,11 +65,9 @@ export class Block implements BywiseTransaction {
             let sliceHash = this.slices[i];
             if (!BywiseHelper.isValidHash(sliceHash)) throw new Error(`invalid block hash ${i} - ${sliceHash}`);
         }
-        if (this.version !== '1' && this.version !== '2') throw new Error('invalid block version ' + this.version);
-        if(this.version == '2') {
-            if (this.chain.length === 0) throw new Error('invalid block chain cant be empty');
-            if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
-        }
+        if (this.version !== '2') throw new Error('invalid block version ' + this.version);
+        if (this.chain.length === 0) throw new Error('invalid block chain cant be empty');
+        if (!BywiseHelper.isValidAlfaNum(this.chain)) throw new Error('invalid chain');
         if (!BywiseHelper.isValidAddress(this.from)) throw new Error('invalid block from address ' + this.from);
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
         if (!BywiseHelper.isValidHash(this.lastHash)) throw new Error('invalid lastHash ' + this.lastHash);

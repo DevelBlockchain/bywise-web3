@@ -124,42 +124,44 @@ export class BywiseApiV2_WS {
         return response;
     }
 
-    private async post(host: string, path: string, token: string | undefined, parameters: any = {}): Promise<BywiseResponse<any>> {
+    private async post(host: string, path: string, token: string | undefined, parameters: any = {}, broadcast?: boolean): Promise<BywiseResponse<any>> {
         const req = {
             id: randomstring.generate(40),
+            broadcast: broadcast,
             path: path,
             method: "POST",
             token,
             query: {},
             body: parameters,
         }
-
         const response: BywiseResponse<any> = {
             data: {}
         };
         try {
             const client = await this.getSocket(host);
             client.send(JSON.stringify(req));
-            for (let i = 0; i < 300; i++) {
-                await BywiseHelper.sleep(100);
-                const res = this.requests.get(req.id);
-                if (res) {
-                    this.requests.delete(req.id);
-                    if (res.status < 200 || res.status >= 300) {
-                        response.error = `${res.body.error}`;
-                    }
-                    response.data = res.body;
-                    if (this.debug) {
-                        console.log(`post ${host}${path}`)
-                        if (response.error) {
-                            console.log(response.error, response.data)
+            if (!broadcast) {
+                for (let i = 0; i < 300; i++) {
+                    await BywiseHelper.sleep(100);
+                    const res = this.requests.get(req.id);
+                    if (res) {
+                        this.requests.delete(req.id);
+                        if (res.status < 200 || res.status >= 300) {
+                            response.error = `${res.body.error}`;
                         }
+                        response.data = res.body;
+                        if (this.debug) {
+                            console.log(`post ${host}${path}`)
+                            if (response.error) {
+                                console.log(response.error, response.data)
+                            }
+                        }
+                        return response;
                     }
-                    return response;
                 }
+                client.close();
+                throw new Error("timeout");
             }
-            client.close();
-            throw new Error("timeout");
         } catch (err: any) {
             this.connections.delete(host);
             response.data = { error: err.message };
@@ -186,7 +188,7 @@ export class BywiseApiV2_WS {
     }
 
     publishNewBlock(node: BywiseNode, block: Block): Promise<BywiseResponse<void>> {
-        return this.post(node.host, `/api/v2/blocks`, node.token, block);
+        return this.post(node.host, `/api/v2/blocks`, node.token, block, true);
     }
 
     getBlocks(node: BywiseNode, chain: string, parameters: { status?: string, offset?: number, limit?: number, asc?: boolean } = {}): Promise<BywiseResponse<PublishedBlock[]>> {
@@ -221,7 +223,7 @@ export class BywiseApiV2_WS {
     }
 
     publishNewSlice(node: BywiseNode, slice: Slice): Promise<BywiseResponse<void>> {
-        return this.post(node.host, `/api/v2/slices`, node.token, slice);
+        return this.post(node.host, `/api/v2/slices`, node.token, slice, true);
     }
 
     getSlices(node: BywiseNode, chain: string, parameters: { status?: string, offset?: number, limit?: number, asc?: boolean }): Promise<BywiseResponse<PublishedSlice[]>> {
@@ -248,7 +250,7 @@ export class BywiseApiV2_WS {
     }
 
     publishNewTransaction(node: BywiseNode, tx: Tx): Promise<BywiseResponse<void>> {
-        return this.post(node.host, `/api/v2/transactions`, node.token, tx);
+        return this.post(node.host, `/api/v2/transactions`, node.token, tx, true);
     }
 
     getTxs(node: BywiseNode, chain: string, parameters: { offset?: number, limit?: number, asc?: boolean, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } }): Promise<BywiseResponse<PublishedTx[]>> {
