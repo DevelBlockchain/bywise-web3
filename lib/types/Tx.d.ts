@@ -21,7 +21,7 @@ export declare enum TxType {
 export declare class Tx implements BywiseTransaction {
     version: string;
     chain: string;
-    validator?: string[];
+    validator: string[];
     from: string[];
     to: string[];
     amount: string[];
@@ -31,7 +31,7 @@ export declare class Tx implements BywiseTransaction {
     data: any;
     created: number;
     hash: string;
-    validatorSign?: string[];
+    validatorSign: string[];
     output: TxOutput;
     sign: string[];
     constructor(tx?: Partial<Tx>);

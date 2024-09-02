@@ -44,14 +44,14 @@ export declare class TransactionsActions {
         limit?: number;
         asc?: boolean;
         find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
+            searchBy: "address" | "from" | "to" | "key" | "status";
             value: string;
         };
     }) => Promise<PublishedTx[] | undefined>;
     countTxs: (parameters?: {
         chain?: string;
         find?: {
-            searchBy: 'address' | 'from' | 'to' | 'key' | 'status';
+            searchBy: "address" | "from" | "to" | "key" | "status";
             value: string;
         };
     }) => Promise<number | undefined>;

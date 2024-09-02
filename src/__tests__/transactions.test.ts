@@ -3,15 +3,46 @@ import { Wallet } from '../utils';
 
 const INVALID_ADDRESS = "BWS1MUf3fE542466114436c184001936CD72D3baeEA06c366"
 
-test('Test transaction - v2', async () => {
-    const jsonTX = {"version":"3","chain":"testnet","from":["BWS1MU44044509189ba478B110c4a5aE3691F9aADe298D1fd"],"to":["BWS1MU44044509189ba478B110c4a5aE3691F9aADe298D1fd"],"amount":["30"],"fee":"2","type":"contract-exe-encrypt","foreignKeys":["acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65"],"data":[{"method":"transfer","inputs":["BWS1MU44044509189ba478B110c4a5aE3691F9aADe298D1fd","100"]}],"output":{"feeUsed":"0","cost":0,"size":0,"ctx":"0000000000000000000000000000000000000000000000000000000000000000","debit":"0","logs":[],"events":[],"get":[],"walletAddress":[],"walletAmount":[],"envs":{"keys":[],"values":[]},"output":""},"created":1721064184,"hash":"1a9bb6ae69e49ff447e6ea9470c591642f7df5a2257d4dbb84cb9332b0471d26","sign":["0x28f255c8d4810bdcb71d741fe86864d759d6ee14256b61f523e9ae7103b7d502168264ba095d201d186730c08f587914d359e5736582a8bf387a254433e604841c"]}
-    const tx = new Tx(jsonTX);
+test('Test transaction - v3', async () => {
+    const wallet = new Wallet();
+    const walletValidator = new Wallet();
+
+    let tx = new Tx();
+    tx.version = '3';
+    tx.chain = "testnet";
+    tx.from = [wallet.address];
+    tx.to = [wallet.address];
+    tx.amount = ['0'];
+    tx.fee = '0';
+    tx.type = TxType.TX_EN_CONTRACT_EXE;
+    tx.data = [{ method: 'transfer', inputs: [wallet.address, `100`] }];
+    tx.foreignKeys = ["acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65"];
+    tx.created = Math.floor(Date.now() / 1000);
+    tx.output = {
+        feeUsed: '0',
+        cost: 0,
+        size: 2,
+        ctx: "0000000000000000000000000000000000000000000000000000000000000000",
+        debit: '0',
+        logs: [],
+        events: [],
+        get: [],
+        walletAddress: [],
+        walletAmount: [],
+        envs: { keys: [], values: [] },
+        output: ''
+    }
+    tx.validator = [walletValidator.address];
+    tx.hash = tx.toHash();
+    tx.sign = [await wallet.signHash(tx.hash)];
+    tx.validatorSign = [await walletValidator.signHash(tx.hash)];
+
     await expect(() => {
         tx.isValid();
     }).not.toThrow();
 });
 
-test('Test version - v2', async () => {
+test('Test version - v3', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
@@ -53,7 +84,7 @@ test('Test version - v2', async () => {
     }).toThrow();
 });
 
-test('Test chain - v2', async () => {
+test('Test chain - v3', async () => {
     const w1 = new Wallet();
 
     const tx = new Tx();
@@ -265,7 +296,7 @@ test('Test amount - v2', async () => {
     await expect(() => {
         tx.isValid();
     }).not.toThrow();
-    
+
     tx.to = [w1.address];
     tx.amount = ['100', '100'];
     tx.hash = tx.toHash();
@@ -524,7 +555,7 @@ test('Test foreignKeys - v2', async () => {
     tx.sign = [await w1.signHash(tx.hash)];
     await expect(() => {
         tx.isValid();
-    }).not.toThrow();
+    }).toThrow();
 
     tx.foreignKeys = new Array(200).fill(w1.address);
     tx.hash = tx.toHash();
@@ -592,25 +623,71 @@ test('Test created - v2', async () => {
 
 test('Test hash - v2', async () => {
     const MESSAGE_ERROR = 'corrupt transaction';
-
     const w1 = new Wallet();
     const w2 = new Wallet();
 
-    const tx = new Tx();
+    let tx = new Tx();
     tx.version = '3';
     tx.chain = "testnet";
     tx.from = [w1.address];
-    tx.to = [w2.address];
-    tx.amount = ['30'];
-    tx.fee = '2';
+    tx.to = [w1.address];
+    tx.amount = ['0'];
+    tx.fee = '0';
     tx.type = TxType.TX_EN_CONTRACT_EXE;
-    tx.data = [{ method: 'transfer', inputs: [w2.address, `100`] }];
+    tx.data = [{ method: 'transfer', inputs: [w1.address, `100`] }];
     tx.foreignKeys = ["acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65"];
     tx.created = Math.floor(Date.now() / 1000);
+    tx.validator = [w2.address];
+    tx.output = {
+        feeUsed: '0',
+        cost: 0,
+        size: 2,
+        ctx: "0000000000000000000000000000000000000000000000000000000000000000",
+        debit: '0',
+        logs: [
+            'text_log'
+        ],
+        events: [
+            {
+                contractAddress: 'BWS1MC66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e',
+                eventName: 'transfer',
+                entries: [
+                    { key: "from", value: 'BWS1MC66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e' },
+                    { key: "to", value: 'BWS1MC66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e' },
+                    { key: "amount", value: "1000" },
+                ],
+                hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'
+            }
+        ],
+        get: [
+            'BWS1MC66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e-WC'
+        ],
+        walletAddress: [
+            'BWS1MU66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e'
+        ],
+        walletAmount: [
+            '100'
+        ],
+        envs: {
+            keys: [
+                `BWS1MC66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e-MC`,
+            ], values: [
+                '"1000"'
+            ]
+        },
+        output: 'true'
+    }
     tx.hash = tx.toHash();
     tx.sign = [await w1.signHash(tx.hash)];
+    tx.validatorSign = [await w2.signHash(tx.hash)];
+
     await expect(() => {
         tx.isValid();
+    }).not.toThrow();
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.isValid();
     }).not.toThrow();
 
     await expect(() => {
@@ -627,7 +704,7 @@ test('Test hash - v2', async () => {
 
     await expect(() => {
         const editedTX = new Tx(tx);
-        editedTX.to = [w1.address];
+        editedTX.to = [w2.address];
         editedTX.isValid();
     }).toThrow(MESSAGE_ERROR);
 
@@ -666,6 +743,115 @@ test('Test hash - v2', async () => {
         editedTX.created = tx.created + 1;
         editedTX.isValid();
     }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const w3 = new Wallet();
+        const editedTX = new Tx(tx);
+        editedTX.validator = [w3.address];
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.cost = 123;
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.ctx = 'dcb5aad7b72072edacd4373262475f224117f1a9113d0471e3d728432cbf4f65';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.debit = '31';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.envs.keys[0] = 'asdf';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.envs.values[0] = 'asdf';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.events[0].contractAddress = 'BWS1MU66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.events[0].entries[0].key = 'asdf';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.events[0].entries[0].value = 'asdf';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.events[0].eventName = 'asdf';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.events[0].hash = 'dcb5aad7b72072edacd4373262475f224117f1a9113d0471e3d728432cbf4f65';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.feeUsed = '31';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.get[0] = 'asdf';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.logs = ['31'];
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.output = '31';
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.size = 123;
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.walletAddress = ['BWS1MU66d6358c3Ed4fED092815c6a98eDB1e632EFA43317e'];
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedTX = new Tx(tx);
+        editedTX.output.walletAmount = ['31'];
+        editedTX.isValid();
+    }).toThrow(MESSAGE_ERROR);
 });
 
 test('Test sign - v2', async () => {
@@ -701,7 +887,7 @@ test('Test sign - v2', async () => {
     await expect(() => {
         tx.isValid();
     }).not.toThrow();
-    
+
     tx.from = [w1.address];
     tx.hash = tx.toHash();
     tx.sign = [await w1.signHash(tx.hash), await w1.signHash(tx.hash)];
@@ -722,7 +908,7 @@ test('Test sign - v2', async () => {
     await expect(() => {
         tx.isValid();
     }).toThrow(MESSAGE_ERROR);
-    
+
     tx.from = [w1.address];
     tx.hash = tx.toHash();
     tx.sign = [await w2.signHash(tx.hash)];

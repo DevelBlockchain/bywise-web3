@@ -28,8 +28,9 @@ export class Tx implements BywiseTransaction {
     from: string[];
     to: string[];
     amount: string[];
+    fee: string;
     type: string;
-    foreignKeys: string[];
+    foreignKeys?: string[];
     data: any;
     created: number;
     hash: string;
@@ -44,11 +45,12 @@ export class Tx implements BywiseTransaction {
         this.from = tx?.from ?? [];
         this.to = tx?.to ?? [];
         this.amount = tx?.amount ?? [];
+        this.fee = tx?.fee ?? '';
         this.type = tx?.type ?? TxType.TX_NONE;
         this.foreignKeys = tx?.foreignKeys ?? [];
         this.data = tx?.data ?? {};
         this.output = {
-            fee: '0',
+            feeUsed: '0',
             cost: 0,
             size: 0,
             ctx: '0000000000000000000000000000000000000000000000000000000000000000',
@@ -65,7 +67,7 @@ export class Tx implements BywiseTransaction {
             output: ''
         };
         if (tx?.output) {
-            this.output.fee = tx.output.fee;
+            this.output.feeUsed = tx.output.feeUsed;
             this.output.cost = tx.output.cost;
             this.output.size = tx.output.size;
             this.output.ctx = tx.output.ctx;
@@ -75,7 +77,7 @@ export class Tx implements BywiseTransaction {
                 const event = tx.output.events[i];
                 const eventDTO: TransactionEvent = {
                     contractAddress: event.contractAddress,
-                    eventName: event.contractAddress,
+                    eventName: event.eventName,
                     entries: [],
                     hash: event.hash,
                 }
@@ -105,13 +107,9 @@ export class Tx implements BywiseTransaction {
         let bytes = '';
         bytes += Buffer.from(this.version, 'utf-8').toString('hex');
         bytes += Buffer.from(this.chain, 'utf-8').toString('hex');
-        if (this.validator) {
-            if (this.validator) {
-                this.validator.forEach(addr => {
-                    bytes += Buffer.from(addr, 'utf-8').toString('hex');;
-                })
-            }
-        }
+        this.validator.forEach(addr => {
+            bytes += Buffer.from(addr, 'utf-8').toString('hex');;
+        })
         this.from.forEach(from => {
             bytes += Buffer.from(from, 'utf-8').toString('hex');
         })
@@ -121,6 +119,9 @@ export class Tx implements BywiseTransaction {
         this.amount.forEach(amount => {
             bytes += Buffer.from(amount, 'utf-8').toString('hex');
         })
+        if (this.fee) {
+            bytes += Buffer.from(this.fee, 'utf-8').toString('hex');
+        }
         bytes += Buffer.from(this.type, 'utf-8').toString('hex');
         bytes += Buffer.from(BywiseHelper.jsonToString(this.data), 'utf-8').toString('hex');
         if (this.foreignKeys) {
@@ -161,16 +162,17 @@ export class Tx implements BywiseTransaction {
         this.amount.forEach(amount => {
             if (!BywiseHelper.isValidAmount(amount)) throw new Error('invalid transaction amount ' + amount);
         })
+        if (!BywiseHelper.isValidAmount(this.fee)) throw new Error('invalid transaction fee ' + this.fee);
         if (!Object.values(TxType).map(t => t.toString()).includes(this.type)) throw new Error('invalid type ' + this.type);
         if (!BywiseHelper.isStringArray(this.foreignKeys)) throw new Error('invalid array');
-        if (this.foreignKeys.length > 100) throw new Error('maximum number of foreignKeys is 100');
-        this.foreignKeys.forEach(key => {
-            if (!BywiseHelper.isValidAlfaNum(key)) throw new Error('invalid foreignKey ' + key);
-        })
+        if (this.foreignKeys) {
+            if (this.foreignKeys.length > 100) throw new Error('maximum number of foreignKeys is 100');
+            this.foreignKeys.forEach(key => {
+                if (!BywiseHelper.isValidAlfaNum(key)) throw new Error('invalid foreignKey ' + key);
+            })
+        }
         if (BywiseHelper.jsonToString(this.data).length > 1048576) throw new Error('data too large');
         if (!BywiseHelper.isValidDate(this.created)) throw new Error('invalid created date');
-        if (!BywiseHelper.isValidHash(this.hash)) throw new Error('invalid transaction hash ' + this.hash);
-        if (this.hash !== this.toHash()) throw new Error('corrupt transaction');
 
         if (!this.output) throw new Error('invalid validator output');
         if (this.output.error !== undefined) throw new Error('transaction output has error');
@@ -191,16 +193,16 @@ export class Tx implements BywiseTransaction {
             if (!BywiseHelper.isValidHash(event.hash)) throw new Error('invalid event.hash');
             event.entries.forEach(entry => {
                 if (!BywiseHelper.isValidAlfaNum(entry.key)) throw new Error('invalid event.entries.key');
-                if (typeof entry.value === 'string') throw new Error('invalid event.entries.value');
-                if (`${entry.value}`.length <= 10000) throw new Error('invalid event.entries.value');
+                if (typeof entry.value !== 'string') throw new Error('invalid event.entries.value');
+                if (`${entry.value}`.length > 10000) throw new Error('invalid event.entries.value');
             })
         })
-        if (!BywiseHelper.isValidAmount(this.output.fee)) throw new Error('invalid fee');
+        if (!BywiseHelper.isValidAmount(this.output.feeUsed)) throw new Error('invalid feeUsed');
         this.output.get.forEach(key => {
             if (!BywiseHelper.isValidAlfaNumSlash(key)) throw new Error('invalid get ' + key);
         })
         this.output.logs.forEach(log => {
-            if (typeof log === 'string') throw new Error('logs');
+            if (typeof log !== 'string') throw new Error('logs');
         })
         if (BywiseHelper.jsonToString(this.output).length > 1048576) throw new Error('output too large');
         if (!BywiseHelper.isValidInteger(this.output.size)) throw new Error('invalid size');
@@ -215,13 +217,16 @@ export class Tx implements BywiseTransaction {
 
         if (!BywiseHelper.isStringArray(this.validator)) throw new Error('invalid array validator');
         if (!BywiseHelper.isStringArray(this.validatorSign)) throw new Error('invalid array validatorSign');
+        if (!BywiseHelper.isStringArray(this.sign)) throw new Error('invalid array');
+        if (!BywiseHelper.isValidHash(this.hash)) throw new Error('invalid transaction hash ' + this.hash);
+        if (this.hash !== this.toHash()) throw new Error('corrupt transaction');
+
         if (this.validator.length !== this.validatorSign.length) throw new Error('invalid validator signature');
-        for (let i = 0; i < this.sign.length; i++) {
+        for (let i = 0; i < this.validatorSign.length; i++) {
             const sign = this.validatorSign[i];
             const addr = this.validator[i];
             if (!BywiseHelper.isValidSign(sign, addr, this.hash)) throw new Error('invalid validator signature');
         }
-        if (!BywiseHelper.isStringArray(this.sign)) throw new Error('invalid array');
         if (this.sign.length === 0) throw new Error('transaction was not signed');
         if (this.sign.length !== this.from.length) throw new Error('invalid signature');
         for (let i = 0; i < this.sign.length; i++) {
@@ -262,7 +267,7 @@ export type TxOutput = {
     output: any;
     cost: number;
     size: number;
-    fee: string;
+    feeUsed: string;
     ctx: string;
     logs: string[];
     debit: string;

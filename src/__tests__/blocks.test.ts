@@ -27,7 +27,7 @@ test('Test version - v2', async () => {
     block.sign = await w1.signHash(block.hash);
     await expect(() => {
         block.isValid();
-    }).not.toThrow();
+    }).toThrow();
 
     block.version = '2';
     block.hash = block.toHash();
@@ -380,12 +380,6 @@ test('Test hash - v2', async () => {
     await expect(() => {
         block.isValid();
     }).not.toThrow();
-
-    await expect(() => {
-        const editedBlock = new Block(block);
-        editedBlock.version = '1';
-        editedBlock.isValid();
-    }).toThrow(MESSAGE_ERROR);
     
     await expect(() => {
         const editedBlock = new Block(block);
