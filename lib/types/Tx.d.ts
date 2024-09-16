@@ -21,7 +21,7 @@ export declare enum TxType {
 export declare class Tx implements BywiseTransaction {
     version: string;
     chain: string;
-    validator: string[];
+    validator?: string;
     from: string[];
     to: string[];
     amount: string[];
@@ -31,49 +31,12 @@ export declare class Tx implements BywiseTransaction {
     data: any;
     created: number;
     hash: string;
-    validatorSign: string[];
-    output: TxOutput;
+    validatorSign?: string;
     sign: string[];
     constructor(tx?: Partial<Tx>);
     toHash(): string;
     isValid(): void;
 }
-export type TransactionEventEntry = {
-    key: string;
-    value: string;
-};
-export type TransactionEvent = {
-    contractAddress: string;
-    eventName: string;
-    entries: TransactionEventEntry[];
-    hash: string;
-};
-export type EnvironmentChanges = {
-    keys: string[];
-    values: (string | null)[];
-};
-export type TransactionChanges = {
-    get: string[];
-    walletAddress: string[];
-    walletAmount: string[];
-    envs: EnvironmentChanges;
-};
-export type TxOutput = {
-    error?: string;
-    stack?: string;
-    output: any;
-    cost: number;
-    size: number;
-    feeUsed: string;
-    ctx: string;
-    logs: string[];
-    debit: string;
-    events: TransactionEvent[];
-    get: string[];
-    walletAddress: string[];
-    walletAmount: string[];
-    envs: EnvironmentChanges;
-};
 export type SimulateTx = {
     chain: string;
     from: string[] | string;
@@ -98,9 +61,18 @@ export type OutputSimulateContract = {
     output: any;
     env: any;
 };
+export type TxOutput = {
+    cost?: number;
+    size?: number;
+    feeUsed: string;
+    fee: string;
+    logs?: string[];
+    error?: string;
+    output?: any;
+};
 export type PublishedTx = {
     version: string;
-    validator?: string[];
+    validator?: string;
     from: string[];
     to: string[];
     amount: string[];
@@ -110,7 +82,7 @@ export type PublishedTx = {
     data: any;
     created: number;
     hash: string;
-    validatorSign?: string[];
+    validatorSign?: string;
     sign: string[];
     status: string;
     output: TxOutput;

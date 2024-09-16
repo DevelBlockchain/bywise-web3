@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { BywiseAddressType, BywiseHelper } from "./BywiseHelper";
+import { BywiseHelper } from "./BywiseHelper";
 
 export class Wallet {
     public readonly seed: string;
@@ -26,12 +26,12 @@ export class Wallet {
     }
 
     getAddress = (tag = ''): string => {
-        return BywiseHelper.encodeBWSAddress(BywiseAddressType.ADDRESS_TYPE_USER, this.account.address, tag);
+        return BywiseHelper.encodeBWSAddress(false, this.account.address, tag);
     }
 
     getStealthAddress = (account: number, index: number, tag = ''): string => {
         const node = ethers.HDNodeWallet.fromPhrase(this.seed).derivePath(`${account}'/${index}`);
-        return BywiseHelper.encodeBWSAddress(BywiseAddressType.ADDRESS_TYPE_STEALTH, node.address, tag);
+        return BywiseHelper.encodeBWSAddress(false, node.address, tag);
     }
 
     signHash = async (hash: string): Promise<string> => {

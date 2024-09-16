@@ -8,16 +8,17 @@ export declare class Slice implements BywiseTransaction {
     blockHeight: number;
     transactions: string[];
     transactionsCount: number;
+    transactionsData?: SliceData[];
     version: string;
     chain: string;
     from: string;
     created: number;
     end: boolean;
-    lastHash: string;
     hash: string;
     sign: string;
     constructor(slice?: Partial<Slice>);
     private getMerkleRoot;
+    private getMerkleRootData;
     toHash(): string;
     isValid(): void;
 }
@@ -26,11 +27,11 @@ export type PublishedSlice = {
     blockHeight: number;
     transactions: string[];
     transactionsCount: number;
+    transactionsData: SliceData[];
     version: string;
     from: string;
     created: number;
     end: boolean;
-    lastHash: string;
     hash: string;
     sign: string;
     status: string;

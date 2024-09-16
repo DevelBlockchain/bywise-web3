@@ -3,13 +3,6 @@ import { ethers } from "ethers";
 import { InfoAddress } from '../types/InfoAddress';
 import { isAddress } from 'web3-validator';
 
-export enum BywiseAddressType {
-    ADDRESS_TYPE_ZERO = 'ADDRESS_TYPE_ZERO',
-    ADDRESS_TYPE_CONTRACT = 'ADDRESS_TYPE_CONTRACT',
-    ADDRESS_TYPE_STEALTH = 'ADDRESS_TYPE_STEALTH',
-    ADDRESS_TYPE_USER = 'ADDRESS_TYPE_USER',
-}
-
 export class BywiseHelper {
     static readonly ZERO_ADDRESS = 'BWS000000000000000000000000000000000000000000000';
 
@@ -24,19 +17,13 @@ export class BywiseHelper {
 
     static getBWSAddressContract = () => {
         const addr = ethers.Wallet.createRandom().address;
-        return BywiseHelper.encodeBWSAddress(BywiseAddressType.ADDRESS_TYPE_CONTRACT, addr);
+        return BywiseHelper.encodeBWSAddress(true, addr);
     }
 
-    static encodeBWSAddress = (typeAddress: BywiseAddressType, ethAddress: string, tag?: string) => {
+    static encodeBWSAddress = (isContract: boolean, ethAddress: string, tag?: string) => {
         let finalAddress = 'BWS1';
         finalAddress += 'M';
-        if(typeAddress == BywiseAddressType.ADDRESS_TYPE_CONTRACT) {
-            finalAddress += 'C';
-        } else if(typeAddress == BywiseAddressType.ADDRESS_TYPE_STEALTH) {
-            finalAddress += 'S';
-        } else {
-            finalAddress += 'U';
-        }
+        finalAddress += isContract ? 'C' : 'U';
         finalAddress += ethAddress.substring(2);
         if (tag) {
             if (!BywiseHelper.isValidAlfaNum(tag)) throw new Error('invalid tag ' + tag);
@@ -54,14 +41,12 @@ export class BywiseHelper {
             return new InfoAddress({
                 version: '1',
                 isContract: false,
-                isStealthAddress: false,
                 ethAddress: '0x0000000000000000000000000000000000000000',
                 tag: '',
             });
         }
         let isMainnet = address.substring(4, 5) === 'M';
         let isContract = address.substring(5, 6) === 'C';
-        let isStealthAddress = address.substring(5, 6) === 'S';
         let ethAddress = '0x' + address.substring(6, 46);
         let tag = address.substring(46, address.length - 3);
         let checkSum = address.substring(address.length - 3);
@@ -72,7 +57,6 @@ export class BywiseHelper {
         return new InfoAddress({
             version: '1',
             isContract,
-            isStealthAddress,
             ethAddress,
             tag,
         });
@@ -84,7 +68,7 @@ export class BywiseHelper {
 
     static getStealthAddressFromExtendedPublicKey = (xpub: string, index: number): string => {
         const node = ethers.HDNodeWallet.fromExtendedKey(xpub).derivePath(`${index}`);
-        return BywiseHelper.encodeBWSAddress(BywiseAddressType.ADDRESS_TYPE_STEALTH, node.address, '');
+        return BywiseHelper.encodeBWSAddress(false, node.address, '');
     }
 
     static isZeroAddress = (address: string) => {
@@ -92,7 +76,7 @@ export class BywiseHelper {
     }
 
     static isValidAddress = (address: string) => {
-        let valid = /^(BWS1[MT][CUS][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
+        let valid = /^(BWS1[MT][CU][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
         if(valid) {
             let ethAddress = '0x' + address.substring(6, 46);
             valid = isAddress(ethAddress)
@@ -102,10 +86,6 @@ export class BywiseHelper {
     
     static isContractAddress = (address: string) => {
         return /^(BWS1[MT][C][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
-    }
-    
-    static isStealthAddress = (address: string) => {
-        return /^(BWS1[MT][S][0-9a-fA-F]{40}[0-9a-zA-Z]{0,64}[0-9a-fA-F]{3})|(BWS000000000000000000000000000000000000000000000)$/.test(address);
     }
 
     static isStringArray = (arr: any) => {
@@ -117,18 +97,11 @@ export class BywiseHelper {
     }
 
     static isValidAmount = (amount: string) => {
-        return /^(0|[1-9][0-9]{0,48})$/.test(amount);
-    }
-    static isValidSignedAmount = (amount: string) => {
-        return /^(0|[\-]{0,1}[1-9][0-9]{0,48})$/.test(amount);
+        return /^((0|[1-9][0-9]{0,24})(\.[0-9]{0,24})?)$/.test(amount);
     }
 
     static isValidAlfaNum = (value: string) => {
         return /^[a-zA-Z0-9_]{0,64}$/.test(value);
-    }
-    
-    static isValidAlfaNumSlash = (value: string) => {
-        return /^[a-zA-Z0-9_\-]{1,300}$/.test(value);
     }
 
     static isValidHash = (value: string) => {

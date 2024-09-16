@@ -1,6 +1,6 @@
 {
   "name": "@bywise/web3",
-  "version": "1.1.8",
+  "version": "1.2.0",
   "description": "Web3 connector of Bywise",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -12,7 +12,7 @@
     "dev": "nodemon --watch 'src/' --exec 'ts-node src/dev.ts' -e ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "test": "jest --watch --verbose false",
+    "test": "jest --watch --verbose false --config jestconfig.json",
     "pub": "tsc && npm publish --access public"
   },
   "repository": {
@@ -33,7 +33,6 @@
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
     "@types/jest": "^29.5.12",
-    "@types/ws": "^8.5.11",
     "jest": "^29.7.0",
     "nodemon": "^3.1.0",
     "prettier": "^3.2.5",

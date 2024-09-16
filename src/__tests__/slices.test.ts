@@ -7,13 +7,13 @@ test('Test version - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -29,14 +29,21 @@ test('Test version - v2', async () => {
     slice.sign = await w1.signHash(slice.hash);
     await expect(() => {
         slice.isValid();
-    }).toThrow("invalid version");
+    }).not.toThrow();
+
+    slice.version = '2';
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).not.toThrow();
 
     slice.version = '3';
     slice.hash = slice.toHash();
     slice.sign = await w1.signHash(slice.hash);
     await expect(() => {
         slice.isValid();
-    }).not.toThrow();
+    }).toThrow();
 
     slice.version = '-1';
     slice.hash = slice.toHash();
@@ -51,13 +58,13 @@ test('Test height - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -96,13 +103,13 @@ test('Test blockHeight - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -141,13 +148,13 @@ test('Test transactionsCount - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -185,13 +192,13 @@ test('Test chain - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -235,13 +242,13 @@ test('Test transactions - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactionsCount = 1;
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -316,17 +323,98 @@ test('Test transactions - v2', async () => {
     }).toThrow();
 });
 
+test('Test transactionsData - v2', async () => {
+    const w1 = new Wallet();
+
+    const slice = new Slice();
+    slice.version = '2';
+    slice.height = 10;
+    slice.blockHeight = 10;
+    slice.chain = 'testnet';
+    slice.transactionsCount = 1;
+    slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
+    slice.from = w1.address;
+    slice.created = Math.floor(Date.now() / 1000);
+    slice.end = false;
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).not.toThrow();
+
+    slice.transactionsData = undefined;
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).not.toThrow();
+
+    slice.transactionsData = [];
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).not.toThrow();
+    
+    slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
+    slice.transactionsCount = 2;
+    slice.transactionsData = [
+        {hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']},
+        {hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']},
+    ];
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).not.toThrow();
+    
+    slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
+    slice.transactionsCount = 2;
+    slice.transactionsData = [
+        {hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}
+    ];
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).not.toThrow();
+
+    slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
+    slice.transactionsCount = 1;
+    slice.transactionsData = [
+        {hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']},
+        {hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']},
+    ];
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).toThrow();
+    
+    slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
+    slice.transactionsCount = 1;
+    slice.transactionsData = [
+        {hash: 'asdf', data: ['some_data']}
+    ];
+    slice.hash = slice.toHash();
+    slice.sign = await w1.signHash(slice.hash);
+    await expect(() => {
+        slice.isValid();
+    }).toThrow();
+});
+
 test('Test from - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -364,13 +452,13 @@ test('Test created - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -405,13 +493,13 @@ test('Test end - v2', async () => {
     const w1 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
     slice.transactionsCount = 1;
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -443,13 +531,13 @@ test('Test hash - v2', async () => {
     const w2 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.transactionsCount = 1;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;
@@ -458,6 +546,12 @@ test('Test hash - v2', async () => {
     await expect(() => {
         slice.isValid();
     }).not.toThrow();
+
+    await expect(() => {
+        const editedSlice = new Slice(slice);
+        editedSlice.version = '1';
+        editedSlice.isValid();
+    }).toThrow(MESSAGE_ERROR);
     
     await expect(() => {
         const editedSlice = new Slice(slice);
@@ -492,7 +586,19 @@ test('Test hash - v2', async () => {
 
     await expect(() => {
         const editedSlice = new Slice(slice);
-        editedSlice.lastHash = '471e3ddcb5aad7b7207acd4373262475f224117f1a9113d02ed728432cbf4f65';
+        editedSlice.transactionsData = [];
+        editedSlice.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedSlice = new Slice(slice);
+        editedSlice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data_other']}];
+        editedSlice.isValid();
+    }).toThrow(MESSAGE_ERROR);
+
+    await expect(() => {
+        const editedSlice = new Slice(slice);
+        editedSlice.transactionsData = [{hash: '471e3ddcb5aad7b720acd4373262475f224117f1a9113d072ed728432cbf4f65', data: ['some_data']}];
         editedSlice.isValid();
     }).toThrow(MESSAGE_ERROR);
 
@@ -522,13 +628,13 @@ test('Test sign - v2', async () => {
     const w2 = new Wallet();
 
     const slice = new Slice();
-    slice.version = '3';
+    slice.version = '2';
     slice.height = 10;
     slice.blockHeight = 10;
     slice.transactionsCount = 1;
     slice.chain = 'testnet';
     slice.transactions = ['acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65'];
-    slice.lastHash = 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65';
+    slice.transactionsData = [{hash: 'acd4373262475f224117f1a9113d0471e3ddcb5aad7b72072ed728432cbf4f65', data: ['some_data']}];
     slice.from = w1.address;
     slice.created = Math.floor(Date.now() / 1000);
     slice.end = false;

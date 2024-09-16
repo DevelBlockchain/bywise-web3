@@ -1,5 +1,4 @@
-import { BywiseApiV2, BywiseNode, BywiseResponse } from "../types";
-import { BywiseApiV2_WS } from "../types/BywiseApiV2_WS";
+import { BywiseApiV1, BywiseApiV2, BywiseNode, BywiseResponse } from "../types";
 export type SendAction = (node: BywiseNode) => Promise<BywiseResponse<any>>;
 export type FilterAction<T> = (node: BywiseNode) => Promise<T | undefined>;
 export type NetworkConfigs = {
@@ -11,9 +10,8 @@ export type NetworkConfigs = {
     debug: boolean;
 };
 export declare class NetworkActions {
-    private readonly apiWS;
-    private readonly api;
-    private readonly apiv1;
+    readonly api: BywiseApiV2;
+    readonly apiv1: BywiseApiV1;
     readonly isClient: boolean;
     readonly myHost: string;
     readonly maxConnectedNodes: number;
@@ -28,7 +26,6 @@ export declare class NetworkActions {
         connectedNodes: BywiseNode[];
     };
     importConnections: (payload: any) => Promise<void>;
-    getAPI(node: BywiseNode): BywiseApiV2 | BywiseApiV2_WS;
     private tryConnectNode;
     connect(initialNodes?: string[]): Promise<boolean>;
     disconnect(): void;

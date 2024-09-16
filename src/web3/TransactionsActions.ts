@@ -1,4 +1,4 @@
-import { PublishedTx, SimulateTx, Tx, TxOutput, TxType } from "../types";
+import { OutputSimulateContract, PublishedTx, SimulateContract, SimulateTx, Tx, TxBlockchainInfo, TxOutput, TxType } from "../types";
 import { BywiseHelper, Wallet } from "../utils";
 import { Web3 } from "./Web3";
 
@@ -200,7 +200,7 @@ export class TransactionsActions {
 
     buildSimpleTx = async (wallet: Wallet, chain: string, to: string | string[], amount: string | string[], type?: TxType, data?: any, foreignKeys?: string[]): Promise<Tx> => {
         const node = await this.web3.network.getRandomNode();
-        const info = await this.web3.network.getAPI(node).getInfo(node.host);
+        const info = await this.web3.network.api.getInfo(node.host);
         let tx = new Tx();
         tx.chain = chain;
         tx.version = "2";
@@ -215,7 +215,7 @@ export class TransactionsActions {
         }
         tx.foreignKeys = foreignKeys ? foreignKeys : [];
         tx.created = info.data.timestamp;
-        tx.output = (await this.estimateFee(tx));
+        tx.fee = (await this.estimateFee(tx)).feeUsed;
         tx.hash = tx.toHash();
         tx.sign = [await wallet.signHash(tx.hash)];
         return tx;
@@ -246,8 +246,7 @@ export class TransactionsActions {
             data: tx.data,
             foreignKeys: tx.foreignKeys,
         };
-        const node = this.web3.network.getRandomNode();
-        let simulate = await this.web3.network.getAPI(node).getFeeTransaction(node, simulateTx);
+        let simulate = await this.web3.network.api.getFeeTransaction(this.web3.network.getRandomNode(), simulateTx);
         if (simulate.error) {
             throw new Error(`Internal error - details: ${simulate.error}`)
         };
@@ -271,13 +270,13 @@ export class TransactionsActions {
 
     sendTransaction = async (tx: Tx): Promise<string | undefined> => {
         return await this.web3.network.sendAll(async (node) => {
-            return await this.web3.network.getAPI(node).publishNewTransaction(node, tx);
+            return await this.web3.network.api.publishNewTransaction(node, tx);
         });
     }
 
     getTransactionByHash = async (txHash: string): Promise<PublishedTx | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.getAPI(node).getTransactionByHash(node, txHash);
+            let req = await this.web3.network.api.getTransactionByHash(node, txHash);
             if (!req.error) {
                 return req.data;
             }
@@ -286,7 +285,7 @@ export class TransactionsActions {
 
     getTxs = async (chain: string, parameters: { offset?: number, limit?: number, asc?: boolean, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } } = {}): Promise<PublishedTx[] | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.getAPI(node).getTxs(node, chain, parameters);
+            let req = await this.web3.network.api.getTxs(node, chain, parameters);
             if (!req.error) {
                 return req.data;
             }
@@ -295,7 +294,7 @@ export class TransactionsActions {
 
     countTxs = async (parameters: { chain?: string, find?: { searchBy: 'address' | 'from' | 'to' | 'key' | 'status', value: string } } = {}): Promise<number | undefined> => {
         return await this.web3.network.findAll(async (node) => {
-            let req = await this.web3.network.getAPI(node).countTxs(node, parameters);
+            let req = await this.web3.network.api.countTxs(node, parameters);
             if (!req.error) {
                 return req.data.count;
             }

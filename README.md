@@ -3,6 +3,7 @@
 </p>
 
 # Bywise Web3
+This is the main package of [@bywise/web3](https://www.npmjs.com/package/@bywise/web3), it contains a collection of comprehensive TypeScript libraries for Interaction with the Bywise REST API and utility functions.
 
 ## Contributors Welcome!
 Hello, this is a relatively simple library that connects websites with the Bywise blockchain. If you have some basic working JS/TS knowledge, please head over to the open bugs/enhancements and help clear the backlog. Thanks in advance! 🤠
